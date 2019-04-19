@@ -3,6 +3,9 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open('requirements.txt', 'r') as fh:
+    reqs = fh.readlines()
+
 setuptools.setup(
     name="cert_chain_resolver",
     version="0.0.1",
@@ -13,6 +16,12 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/rkoopmans/python-certificate-chain-resolver",
     packages=setuptools.find_packages(),
+    install_requires=reqs,
+    entry_points={
+        'console_scripts': [
+            "cert-chain-resolver = cli:cli"
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 2.7",
