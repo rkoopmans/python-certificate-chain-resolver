@@ -18,7 +18,7 @@ def cli():
         cr.resolve(cert)
         sys.stdout.writelines([x.export() for x in cr.list()])
     except UnsuportedCertificateType as e:
-        sys.stdout.write(repr(e) + '\n')
+        sys.stderr.write(repr(e) + '\n')
 
 
 if __name__ == '__main__':
