@@ -103,9 +103,10 @@ class ChainResolver:
         r = Resolver(cert, content_type)
         self._chain.append(CertContainer(x509=r.cert, details=r.get_details()))
 
-        content_type, parent_cert = r.get_parent_cert()
-        if parent_cert and (self.depth is None or len(self._chain) <= self.depth):
-            return self.resolve(parent_cert, content_type=content_type)
+        if (self.depth is None or len(self._chain) <= self.depth):
+            content_type, parent_cert = r.get_parent_cert()
+            if parent_cert:
+                return self.resolve(parent_cert, content_type=content_type)
 
     def list(self):
         return self._chain
