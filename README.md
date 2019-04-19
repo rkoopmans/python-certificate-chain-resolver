@@ -2,10 +2,11 @@
 
 Still in development
 
+*Note:* pkcs7 is not supported and it will fail to parse the letsencrypt root certificate.
+
 ## Dependencies
 
-* PyOpenSSL
-* pyasn1-modules
+* cryptography
 
 ## Usage
 
@@ -25,8 +26,7 @@ bootstrap
 
 ## Todo
 
-* Accept ANS1 format as input
-* Accept PEM format in the AuthorityInfoAccess fields
+* support pkcs7 
 * Verbose mode
 * More CLI flags
 * Pypi package
