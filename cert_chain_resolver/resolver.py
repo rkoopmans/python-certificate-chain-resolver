@@ -48,11 +48,11 @@ class Resolver:
         return {
             "issuer": self.cert.issuer.rfc4514_string(),
             "subject": self.cert.subject.rfc4514_string(),
-            "fingerprint__sha256": self.fingerprint(),
-            "signatureAlgorithm": self.cert.signature_hash_algorithm.name,
+            "fingerprint_sha256": self.fingerprint(),
+            "signature_algorithm": self.cert.signature_hash_algorithm.name,
             "serial": self.cert.serial_number,
-            "notBefore": self.cert.not_valid_before,
-            "notAfter": self.cert.not_valid_after,
+            "not_before": self.cert.not_valid_before,
+            "not_after": self.cert.not_valid_after,
             "san": self._get_san(),
             "ca": self._is_ca(),
         }
