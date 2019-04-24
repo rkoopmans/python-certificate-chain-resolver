@@ -17,13 +17,14 @@ def cli():
     cr = ChainResolver(depth=args.depth)
     try:
         cr.resolve(cert)
-        if args.info:
-            import pprint
-            pprint.pprint([x.details for x in cr.list()], indent=2)
-        else:
-            sys.stdout.writelines([x.export() for x in cr.list()])
     except UnsuportedCertificateType as e:
         sys.stderr.write(repr(e) + '\n')
+
+    if args.info:
+        import pprint
+        pprint.pprint([x.details for x in cr.list()], indent=2)
+    else:
+        sys.stdout.writelines([x.export() for x in cr.list()])
 
 
 if __name__ == '__main__':
