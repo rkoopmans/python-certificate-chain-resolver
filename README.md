@@ -31,3 +31,4 @@ bootstrap
 * More CLI flags
 * Pypi package
 * Unit tests
+* Pretty print detailed output
