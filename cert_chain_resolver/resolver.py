@@ -86,7 +86,7 @@ class Resolver:
         req = Request(url, headers={"User-Agent": "Cert/fixer"})
         log.debug("Downloading: {0}".format(url))
         with closing(urlopen(req)) as resp:
-            content_type = resp.headers.getheader("Content-Type").split("/", 1)[-1]
+            content_type = resp.headers.getheader("Content-Type", "").split("/", 1)[-1]
             return content_type, resp.read()
 
 
