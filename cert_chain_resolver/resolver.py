@@ -1,6 +1,6 @@
 from cryptography import x509
 from cryptography.hazmat.backends.openssl.backend import backend as OpenSSLBackend
-from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID
+from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import Encoding
 from contextlib import closing
@@ -53,6 +53,7 @@ class Resolver:
             "serial": self.cert.serial_number,
             "not_before": self.cert.not_valid_before,
             "not_after": self.cert.not_valid_after,
+            "common_name": self._get_common_name(),
             "san": self._get_san(),
             "ca": self._is_ca(),
         }
@@ -74,6 +75,11 @@ class Resolver:
     def _is_ca(self):
         ext = self.cert.extensions.get_extension_for_oid(ExtensionOID.BASIC_CONSTRAINTS)
         return ext.value.ca
+
+    def _get_common_name(self):
+        cn = [x.value for x in self.cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)]
+        if cn:
+            return cn[0]
 
     def _get_san(self):
         try:
