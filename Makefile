@@ -10,3 +10,15 @@ $(PIP):
 .reqs: $(PIP) requirements.txt
 	$(PIP) install -r requirements.txt
 	@touch $@
+
+.build:
+	$(dir $(PIP))/python setup.py bdist_wheel  --universal
+	touch $@
+
+build: .build
+
+publish: .build
+	twine upload dist/*
+
+clean:
+	rm -rf dist/ .build
