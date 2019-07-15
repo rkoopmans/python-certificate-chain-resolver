@@ -26,7 +26,7 @@ from stdin:
 
     $ cat certificate.crt | python -m cert_chain_resolver.cli > bundle.crt
 
-## Developement
+## Development
 
 bootstrap
 
