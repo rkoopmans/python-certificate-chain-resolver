@@ -8,6 +8,14 @@ Still in development
 
 * cryptography
 
+## Install
+
+[Pypi](https://pypi.org/project/cert-chain-resolver/)
+
+
+    $ pip install cert-chain-resolver
+
+
 ## Usage
 
 from file:
@@ -29,6 +37,5 @@ bootstrap
 * support pkcs7 
 * Verbose mode
 * More CLI flags
-* Pypi package
 * Unit tests
 * Pretty print detailed output
