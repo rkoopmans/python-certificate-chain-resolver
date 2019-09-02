@@ -8,7 +8,7 @@ with open('requirements.txt', 'r') as fh:
 
 setuptools.setup(
     name="cert_chain_resolver",
-    version="0.1.0",
+    version="0.2.0",
     author="Remco Koopmans",
     author_email="me@remcokoopmans.com",
     description="Resolve certificate chain by giving a cert as input",
