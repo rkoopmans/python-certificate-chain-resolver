@@ -2,11 +2,10 @@
 
 Still in development
 
-*Note:* pkcs7 is not supported and it will fail to parse the letsencrypt root certificate.
-
 ## Dependencies
 
 * cryptography
+* pyOpenSSL
 
 ## Install
 
@@ -26,6 +25,7 @@ from stdin:
 
     $ cat certificate.crt | python -m cert_chain_resolver.cli > bundle.crt
 
+
 ## Development
 
 bootstrap
@@ -34,7 +34,7 @@ bootstrap
 
 ## Todo
 
-* support pkcs7 
+* support cross signed certificates, currently it only processes the first in a bundle
 * Verbose mode
 * More CLI flags
 * Unit tests
