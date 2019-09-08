@@ -116,7 +116,10 @@ class Resolver:
         return txt
 
     def _is_ca(self):
-        ext = self.cert.extensions.get_extension_for_oid(ExtensionOID.BASIC_CONSTRAINTS)
+        try:
+            ext = self.cert.extensions.get_extension_for_oid(ExtensionOID.BASIC_CONSTRAINTS)
+        except x509.extensions.ExtensionNotFound:
+            return None
         return ext.value.ca
 
     def _get_common_name(self):
