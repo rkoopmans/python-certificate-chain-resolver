@@ -119,7 +119,7 @@ class Resolver:
         try:
             ext = self.cert.extensions.get_extension_for_oid(ExtensionOID.BASIC_CONSTRAINTS)
         except x509.extensions.ExtensionNotFound:
-            return None
+            return False
         return ext.value.ca
 
     def _get_common_name(self):
