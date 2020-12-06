@@ -30,7 +30,7 @@ class CertContainer(object):
         self.details = details
 
     def export(self, encoding=Encoding.PEM):
-        return self.x509.public_bytes(encoding)
+        return str(self.x509.public_bytes(encoding))
 
 
 def pkcs7_get_certs(self):
@@ -65,9 +65,10 @@ def pkcs7_get_certs(self):
 class Resolver:
     def __init__(self, cert, content_type=None):
         try:
-            if cert.startswith("-----BEGIN CERTIFICATE-----"):
+            if str(cert).startswith("-----BEGIN CERTIFICATE-----"):
                 log.debug("Loading file with content_type pem")
-                self.cert = x509.load_pem_x509_certificate(bytes(cert), OpenSSLBackend)
+                encoded_cert = bytes(cert, encoding='utf8')
+                self.cert = x509.load_pem_x509_certificate(encoded_cert, OpenSSLBackend)
             elif content_type == "pkcs7-mime":
                 pkcs7 = crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, cert)
                 certs = pkcs7_get_certs(pkcs7)
@@ -78,7 +79,7 @@ class Resolver:
                 self.cert = certs[0]
             else:
                 log.debug("Loading file with content_type {0}".format(content_type))
-                self.cert = x509.load_der_x509_certificate(bytes(cert), OpenSSLBackend)
+                self.cert = x509.load_der_x509_certificate(cert, OpenSSLBackend)
         except ValueError:
             raise UnsuportedCertificateType("Failed to load cert with content_type={0}".format(content_type))
 
@@ -136,7 +137,11 @@ class Resolver:
         req = Request(url, headers={"User-Agent": "Cert/fixer"})
         log.debug("Downloading: {0}".format(url))
         with closing(urlopen(req)) as resp:
-            content_type = resp.headers.getheader("Content-Type", "").split("/", 1)[-1]
+            if six.PY2:
+                ct_header = resp.headers.getheader("Content-Type", "")
+            else:
+                ct_header = resp.headers.get("Content-Type", "")
+            content_type = ct_header.split("/", 1)[-1]
             return content_type, resp.read()
 
 
