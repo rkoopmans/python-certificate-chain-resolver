@@ -17,6 +17,21 @@ Still in development
 
 ## Usage
 
+### Installed using PIP
+
+    $ cert_chain_resolver certificate.crt > bundle.crt
+
+Or read from stdin
+
+    $ cat certificate.crt | cert_chain_resolver > bundle.crt
+
+
+### After cloning the repository
+
+Install dependencies
+
+    $ make
+
 from file:
 
     $ python -m cert_chain_resolver.cli certificate.crt > bundle.crt
@@ -31,6 +46,17 @@ from stdin:
 bootstrap
 
     $ make
+
+### Testing
+
+Unit testing
+
+    $ make tests
+
+Re-run tests on file changes:
+
+    $ make tests TEST_ARGS="-- -f"
+
 
 ## Todo
 
