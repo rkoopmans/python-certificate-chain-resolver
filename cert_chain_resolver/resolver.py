@@ -33,7 +33,6 @@ class CertContainer(object):
         return self.x509.public_bytes(encoding)
 
 
-
 def pkcs7_get_certs(self):
     """
     https://github.com/pyca/pyopenssl/pull/367/files#r67300900
@@ -47,6 +46,7 @@ def pkcs7_get_certs(self):
     :rtype: :class:`tuple` of :class:`X509` or :const:`None`
     """
     from OpenSSL.crypto import _lib, _ffi, X509
+
     certs = _ffi.NULL
     if self.type_is_signed():
         certs = self._pkcs7.d.sign.cert
@@ -55,13 +55,11 @@ def pkcs7_get_certs(self):
 
     pycerts = []
     for i in range(_lib.sk_X509_num(certs)):
-        x509 = _ffi.gc(_lib.X509_dup(_lib.sk_X509_value(certs, i)),
-                       _lib.X509_free)
+        x509 = _ffi.gc(_lib.X509_dup(_lib.sk_X509_value(certs, i)), _lib.X509_free)
         pycert = X509._from_raw_x509_ptr(x509)
         pycerts.append(pycert)
     if pycerts:
         return [x.to_cryptography() for x in pycerts]
-
 
 
 class Resolver:
@@ -70,13 +68,13 @@ class Resolver:
             if cert.startswith("-----BEGIN CERTIFICATE-----"):
                 log.debug("Loading file with content_type pem")
                 self.cert = x509.load_pem_x509_certificate(bytes(cert), OpenSSLBackend)
-            elif content_type == 'pkcs7-mime':
+            elif content_type == "pkcs7-mime":
                 pkcs7 = crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, cert)
                 certs = pkcs7_get_certs(pkcs7)
                 if not len(certs):
-                    raise ValueError('No certs in pkcs7')
+                    raise ValueError("No certs in pkcs7")
                 elif len(certs) > 1:
-                    log.warning('Multiple certs found but only processing the first one')
+                    log.warning("Multiple certs found but only processing the first one")
                 self.cert = certs[0]
             else:
                 log.debug("Loading file with content_type {0}".format(content_type))
@@ -112,7 +110,7 @@ class Resolver:
         binary = self.cert.fingerprint(_hash())
         txt = binascii.hexlify(binary)
         if six.PY3:
-            txt = txt.decode('ascii')
+            txt = txt.decode("ascii")
         return txt
 
     def _is_ca(self):
@@ -155,7 +153,7 @@ class ChainResolver:
         r = Resolver(cert, content_type)
         self._chain.append(CertContainer(x509=r.cert, details=r.get_details()))
 
-        if (self.depth is None or len(self._chain) <= self.depth):
+        if self.depth is None or len(self._chain) <= self.depth:
             content_type, parent_cert = r.get_parent_cert()
             if parent_cert:
                 return self.resolve(parent_cert, content_type=content_type)
