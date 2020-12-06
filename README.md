@@ -1,5 +1,7 @@
 # Resolve certificate chains
 
+[![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
+
 Still in development
 
 ## Dependencies
