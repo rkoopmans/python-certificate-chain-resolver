@@ -4,8 +4,23 @@ from resolver import ChainResolver, UnsuportedCertificateType
 
 
 def cli():
-    parser = argparse.ArgumentParser(description="Ssl certificate chain resolver")
-    parser.add_argument("certificate", nargs="?", default=sys.stdin, type=open, help="file formatted as PEM")
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""
+Resolve / obtain the certificate intermediates of given x509 certificate. This tool writes the full bundle to stdout.
+
+Examples:
+
+    Using a file:
+
+    $ cert_chain_resolver certificate.crt > bundle.crt
+
+    Using stdin:
+
+    $ cat certificate.crt | cert_chain_resolver > bundle.crt
+    """,
+    )
+    parser.add_argument("cert", nargs="?", default=sys.stdin, type=open, help="file formatted as PEM")
     parser.add_argument(
         "-d",
         "--depth",
@@ -20,7 +35,7 @@ def cli():
         sys.argv += ["-h"]
 
     args = parser.parse_args()
-    cert = args.certificate.read()
+    cert = args.cert.read()
     cr = ChainResolver(depth=args.depth)
     try:
         cr.resolve(cert)
