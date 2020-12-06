@@ -1,1 +1,5 @@
 *.py[co]
+.reqs
+.reqs_dev
+.tox
+*.egg-info

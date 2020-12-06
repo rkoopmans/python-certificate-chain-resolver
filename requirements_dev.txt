@@ -1,0 +1,5 @@
+tox
+twine
+pytest-mock
+pytest
+pytest-xdist
