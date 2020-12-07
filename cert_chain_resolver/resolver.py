@@ -37,6 +37,10 @@ class CertContainer(object):
     def export(self, encoding=Encoding.PEM):
         return unicode(self.x509.public_bytes(encoding), 'utf8')
 
+    @property
+    def is_root(self):
+        return self.details['subject'] == self.details['issuer']
+
 
 def pkcs7_get_certs(self):
     """
@@ -175,4 +179,4 @@ class ChainResolver:
                 return self.resolve(parent_cert, content_type=content_type)
 
     def list(self):
-        return self._chain
+        return [x for x in self._chain if not x.is_root]
