@@ -14,6 +14,11 @@ try:
 except ImportError:
     from urllib2 import urlopen, Request
 
+try:
+    unicode
+except NameError:
+    unicode = str
+
 log = logging.getLogger(__name__)
 
 
@@ -30,7 +35,7 @@ class CertContainer(object):
         self.details = details
 
     def export(self, encoding=Encoding.PEM):
-        return str(self.x509.public_bytes(encoding))
+        return unicode(self.x509.public_bytes(encoding), 'utf8')
 
 
 def pkcs7_get_certs(self):
@@ -64,10 +69,16 @@ def pkcs7_get_certs(self):
 
 class Resolver:
     def __init__(self, cert, content_type=None):
+        is_pem = False
         try:
-            if str(cert).startswith("-----BEGIN CERTIFICATE-----"):
+            is_pem = unicode(cert).startswith("-----BEGIN CERTIFICATE-----")
+        except UnicodeDecodeError:
+            pass
+
+        try:
+            if is_pem:
                 log.debug("Loading file with content_type pem")
-                encoded_cert = bytes(cert, encoding='utf8')
+                encoded_cert = bytes(cert) if six.PY2 else bytes(cert, 'utf8')
                 self.cert = x509.load_pem_x509_certificate(encoded_cert, OpenSSLBackend)
             elif content_type == "pkcs7-mime":
                 pkcs7 = crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, cert)
@@ -80,7 +91,7 @@ class Resolver:
             else:
                 log.debug("Loading file with content_type {0}".format(content_type))
                 self.cert = x509.load_der_x509_certificate(cert, OpenSSLBackend)
-        except ValueError:
+        except ValueError as e:
             raise UnsuportedCertificateType("Failed to load cert with content_type={0}".format(content_type))
 
     def get_details(self):
