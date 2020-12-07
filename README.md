@@ -8,6 +8,12 @@ Still in development
 
 * cryptography
 * pyOpenSSL
+* six
+
+## Python Support
+
+* Python 2.7
+* Python 3.5, 3.6, 3.7, 3.8, 3.9, 3.10
 
 ## Install
 
@@ -65,5 +71,4 @@ Re-run tests on file changes:
 * support cross signed certificates, currently it only processes the first in a bundle
 * Verbose mode
 * More CLI flags
-* Unit tests
 * Pretty print detailed output
