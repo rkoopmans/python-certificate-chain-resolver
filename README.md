@@ -1,6 +1,7 @@
 # Resolve certificate chains
 
 [![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
+![Tests](https://github.com/rkoopmans/python-certificate-chain-resolver/workflows/CI%20tests/badge.svg?branch=v1)
 
 Still in development
 
