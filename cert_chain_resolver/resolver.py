@@ -87,7 +87,7 @@ class Resolver:
             elif content_type == "pkcs7-mime":
                 pkcs7 = crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, cert)
                 certs = pkcs7_get_certs(pkcs7)
-                if not len(certs):
+                if not certs:
                     raise ValueError("No certs in pkcs7")
                 elif len(certs) > 1:
                     log.warning("Multiple certs found but only processing the first one")
