@@ -3,3 +3,5 @@
 .reqs_dev
 .tox
 *.egg-info
+.coverage
+htmlcov
