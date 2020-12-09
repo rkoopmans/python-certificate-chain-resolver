@@ -1,7 +1,7 @@
 ENV_DIR = ./env
-PIP = $(ENV_DIR)/bin/pip
+PIP := $(ENV_DIR)/bin/pip
 
-.PHONY: all tests
+.PHONY: all tests coverage
 
 all: tests
 
@@ -27,6 +27,9 @@ publish: tests .build
 
 tests: .reqs .reqs_dev
 	./env/bin/tox $(TEST_ARGS)
+
+coverage:
+	./env/bin/py.test --cov-report html --cov=cert_chain_resolver --cov-fail-under=90
 
 clean:
 	rm -rf dist .build .reqs_dev .reqs $(ENV_DIR) .tox
