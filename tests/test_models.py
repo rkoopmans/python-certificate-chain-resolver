@@ -23,6 +23,7 @@ def test_certcontainer_x509_helper_props(cert):
     assert fixture["not_before"] == c.not_valid_before
     assert fixture["not_after"] == c.not_valid_after
     assert fixture["fingerprint_sha256"] == c.fingerprint
+    assert fixture["ca_issuer_access_location"] == c.ca_issuer_access_location
 
 
 @pytest.mark.parametrize(
@@ -42,15 +43,9 @@ def test_certcontainer_x509_is_root(_subject):
 @pytest.mark.parametrize("cert", CERT_FIXTURES, ids=certfixture_to_id)
 def test_certcontainer_x509_exports(cert):
     c = Cert(cert["cert_x509"])
-    # print(repr(cert["cert_pem"].decode('ascii') + "\n"))
-    # print()
-    # print(repr(c.export()))
     a = unicode(cert["cert_pem"], "ascii")
     b = c.export()
 
-    print(repr(a))
-    print(type(a), type(b))
-    print(repr(b))
     assert a == b
 
 
@@ -66,9 +61,10 @@ def test_chaincontainer_props(mocker):
 
     c = CertificateChain()
     for cert in [leaf, intermediate1, intermediate2]:
-        c.add(cert)
+        c += cert
 
     assert leaf == c.leaf
     assert [intermediate1, intermediate2] == list(c.intermediates)
     assert [leaf, intermediate1, intermediate2] == [x for x in c]
     assert [leaf, intermediate1, intermediate2] == list(c)
+    assert 3 == len(c)

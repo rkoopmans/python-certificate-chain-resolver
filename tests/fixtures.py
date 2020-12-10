@@ -31,6 +31,7 @@ _TEST_BUNDLES = [
                 "san": ["github.com", "www.github.com"],
                 "serial": 7101927171473588541993819712332065657,
                 "signature_algorithm": "sha256",
+                "ca_issuer_access_location": "http://cacerts.digicert.com/DigiCertSHA2HighAssuranceServerCA.crt",
             },
         },
         {
@@ -50,6 +51,7 @@ _TEST_BUNDLES = [
                 "signature_algorithm": "sha256",
                 "subject": "CN=DigiCert SHA2 High Assurance Server "
                 "CA,OU=www.digicert.com,O=DigiCert Inc,C=US",
+                "ca_issuer_access_location": None,
             },
         },
     ],
@@ -70,6 +72,7 @@ _TEST_BUNDLES = [
                 "serial": 263000687849867688464024588993439613763508,
                 "signature_algorithm": "sha256",
                 "subject": "CN=cert-chain-resolver.remcokoopmans.com",
+                "ca_issuer_access_location": "http://r3.i.lencr.org/",
             },
         },
         {
@@ -87,6 +90,7 @@ _TEST_BUNDLES = [
                 "serial": 85078157426496920958827089468591623647,
                 "signature_algorithm": "sha256",
                 "subject": "CN=R3,O=Let's Encrypt,C=US",
+                "ca_issuer_access_location": "http://apps.identrust.com/roots/dstrootcax3.p7c",
             },
         },
     ],
