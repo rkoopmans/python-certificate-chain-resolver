@@ -8,7 +8,6 @@ Still in development
 ## Dependencies
 
 * cryptography
-* six
 
 ## Python Support
 

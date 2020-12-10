@@ -3,7 +3,6 @@ from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, N
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import Encoding
 import binascii
-import six
 
 try:
     unicode
