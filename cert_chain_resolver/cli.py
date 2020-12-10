@@ -1,22 +1,19 @@
 import argparse
 import sys
-from cert_chain_resolver.resolver import ChainResolver, UnsuportedCertificateType
+from cert_chain_resolver.resolver import resolve
 
 
 def cli(cert=None, depth=None, info=None):
     cert = cert.read()
-    cr = ChainResolver(depth=depth)
-    try:
-        cr.resolve(cert)
-    except UnsuportedCertificateType as e:
-        sys.stderr.write(repr(e) + "\n")
 
+    certs = resolve(cert)
     if info:
         import pprint
 
         pprint.pprint([x.details for x in cr.list()], indent=2)
     else:
-        sys.stdout.write("".join([x.export() for x in cr.list()]))
+        for c in [certs.leaf] + list(certs.intermediates):
+            sys.stdout.write(c.export())
 
 
 def parse_args():
@@ -42,14 +39,6 @@ Examples:
         default="-",
         type=argparse.FileType("rb"),
         help="file formatted as PEM",
-    )
-    parser.add_argument(
-        "-d",
-        "--depth",
-        nargs="?",
-        default=None,
-        type=int,
-        help="Recursion max-depth. Default is until no parent cert is found",
     )
     parser.add_argument(
         "-i", "--info", action="store_true", help="Print chain derived information"
