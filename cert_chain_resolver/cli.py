@@ -13,9 +13,10 @@ def cli(cert=None, depth=None, info=None):
 
     if info:
         import pprint
+
         pprint.pprint([x.details for x in cr.list()], indent=2)
     else:
-        sys.stdout.writelines([x.export() for x in cr.list()])
+        sys.stdout.write("".join([x.export() for x in cr.list()]))
 
 
 def parse_args():
@@ -35,7 +36,13 @@ Examples:
     $ cat certificate.crt | cert_chain_resolver > bundle.crt
     """,
     )
-    parser.add_argument("cert", nargs="?", default=sys.stdin, type=open, help="file formatted as PEM")
+    parser.add_argument(
+        "cert",
+        nargs="?",
+        default="-",
+        type=argparse.FileType("rb"),
+        help="file formatted as PEM",
+    )
     parser.add_argument(
         "-d",
         "--depth",
@@ -44,7 +51,9 @@ Examples:
         type=int,
         help="Recursion max-depth. Default is until no parent cert is found",
     )
-    parser.add_argument("-i", "--info", action="store_true", help="Print chain derived information")
+    parser.add_argument(
+        "-i", "--info", action="store_true", help="Print chain derived information"
+    )
     return parser.parse_args()
 
 
@@ -52,5 +61,6 @@ if __name__ == "__main__":
     if sys.stdin.isatty() and len(sys.argv) == 1:
         sys.argv += ["-h"]
 
-    args = vars(parse_args())
+    pargs = parse_args()
+    args = vars(pargs)
     cli(**args)
