@@ -8,7 +8,6 @@ Still in development
 ## Dependencies
 
 * cryptography
-* pyOpenSSL
 * six
 
 ## Python Support

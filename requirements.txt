@@ -1,3 +1,2 @@
 cryptography>=2.5
-pyOpenSSL
 six
