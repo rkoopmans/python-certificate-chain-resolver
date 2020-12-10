@@ -1,9 +1,7 @@
 from cryptography import x509
-from cryptography.hazmat.backends.openssl.backend import backend as OpenSSLBackend
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import Encoding
-from OpenSSL import crypto
 from contextlib import closing
 import logging
 import binascii
@@ -35,68 +33,18 @@ class CertContainer(object):
         self.details = details
 
     def export(self, encoding=Encoding.PEM):
-        return unicode(self.x509.public_bytes(encoding), 'utf8')
+        return self.x509.export()
 
     @property
     def is_root(self):
-        return self.details['subject'] == self.details['issuer']
-
-
-def pkcs7_get_certs(self):
-    """
-    https://github.com/pyca/pyopenssl/pull/367/files#r67300900
-
-    Returns all certificates for the PKCS7 structure, if present. Only
-    objects of type ``signedData`` or ``signedAndEnvelopedData`` can embed
-    certificates.
-
-    :return: The certificates in the PKCS7, or :const:`None` if
-        there are none.
-    :rtype: :class:`tuple` of :class:`X509` or :const:`None`
-    """
-    from OpenSSL.crypto import _lib, _ffi, X509
-
-    certs = _ffi.NULL
-    if self.type_is_signed():
-        certs = self._pkcs7.d.sign.cert
-    elif self.type_is_signedAndEnveloped():
-        certs = self._pkcs7.d.signed_and_enveloped.cert
-
-    pycerts = []
-    for i in range(_lib.sk_X509_num(certs)):
-        x509 = _ffi.gc(_lib.X509_dup(_lib.sk_X509_value(certs, i)), _lib.X509_free)
-        pycert = X509._from_raw_x509_ptr(x509)
-        pycerts.append(pycert)
-    if pycerts:
-        return [x.to_cryptography() for x in pycerts]
+        return self.x509.is_root
 
 
 class Resolver:
     def __init__(self, cert, content_type=None):
-        is_pem = False
-        try:
-            is_pem = unicode(cert).startswith("-----BEGIN CERTIFICATE-----")
-        except UnicodeDecodeError:
-            pass
+        from cert_chain_resolver.utils import load_bytes_to_x509
 
-        try:
-            if is_pem:
-                log.debug("Loading file with content_type pem")
-                encoded_cert = bytes(cert) if six.PY2 else bytes(cert, 'utf8')
-                self.cert = x509.load_pem_x509_certificate(encoded_cert, OpenSSLBackend)
-            elif content_type == "pkcs7-mime":
-                pkcs7 = crypto.load_pkcs7_data(crypto.FILETYPE_ASN1, cert)
-                certs = pkcs7_get_certs(pkcs7)
-                if not certs:
-                    raise ValueError("No certs in pkcs7")
-                elif len(certs) > 1:
-                    log.warning("Multiple certs found but only processing the first one")
-                self.cert = certs[0]
-            else:
-                log.debug("Loading file with content_type {0}".format(content_type))
-                self.cert = x509.load_der_x509_certificate(cert, OpenSSLBackend)
-        except ValueError as e:
-            raise UnsuportedCertificateType("Failed to load cert with content_type={0}".format(content_type))
+        self.cert = load_bytes_to_x509(cert)
 
     def get_details(self):
         return {
@@ -114,7 +62,9 @@ class Resolver:
 
     def get_parent_cert(self):
         try:
-            aias = self.cert.extensions.get_extension_for_oid(ExtensionOID.AUTHORITY_INFORMATION_ACCESS)
+            aias = self.cert._x509.extensions.get_extension_for_oid(
+                ExtensionOID.AUTHORITY_INFORMATION_ACCESS
+            )
             for aia in aias.value:
                 if AuthorityInformationAccessOID.CA_ISSUERS == aia.access_method:
                     return self._download(aia.access_location.value)
@@ -131,19 +81,26 @@ class Resolver:
 
     def _is_ca(self):
         try:
-            ext = self.cert.extensions.get_extension_for_oid(ExtensionOID.BASIC_CONSTRAINTS)
+            ext = self.cert.extensions.get_extension_for_oid(
+                ExtensionOID.BASIC_CONSTRAINTS
+            )
         except x509.extensions.ExtensionNotFound:
             return False
         return ext.value.ca
 
     def _get_common_name(self):
-        cn = [x.value for x in self.cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)]
+        cn = [
+            x.value
+            for x in self.cert.subject.get_attributes_for_oid(NameOID.COMMON_NAME)
+        ]
         if cn:
             return cn[0]
 
     def _get_san(self):
         try:
-            ext = self.cert.extensions.get_extension_for_oid(ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
+            ext = self.cert.extensions.get_extension_for_oid(
+                ExtensionOID.SUBJECT_ALTERNATIVE_NAME
+            )
             return ext.value.get_values_for_type(x509.DNSName)
         except x509.extensions.ExtensionNotFound:
             return None
@@ -171,7 +128,7 @@ class ChainResolver:
 
     def resolve(self, cert, content_type=None):
         r = Resolver(cert, content_type)
-        self._chain.append(CertContainer(x509=r.cert, details=r.get_details()))
+        self._chain.append(CertContainer(x509=r.cert, details={}))
 
         if self.depth is None or len(self._chain) <= self.depth:
             content_type, parent_cert = r.get_parent_cert()

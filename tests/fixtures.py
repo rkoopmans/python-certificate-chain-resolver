@@ -6,11 +6,9 @@ import six
 
 
 def _add_cert_objects_to_chain(cert):
-    with open(cert["source_cert"], "r") as f:
-        cert["cert_pem"] = "\n".join(f.read().splitlines()) + "\n"
-
-    encoded = bytes(cert["cert_pem"]) if six.PY2 else bytes(cert["cert_pem"], "utf8")
-    cert["cert_x509"] = x509.load_pem_x509_certificate(encoded)
+    with open(cert["source_cert"], "rb") as f:
+        cert["cert_pem"] = f.read()
+    cert["cert_x509"] = x509.load_pem_x509_certificate(cert["cert_pem"])
     return cert
 
 
@@ -94,6 +92,13 @@ _TEST_BUNDLES = [
     ],
 ]
 
+
+TEST_CERTS_IN_VARIOUS_FORMATS = {
+    "pem": "./tests/certs/cert-chain-resolver.remcokoopmans.com.pem",
+    "p7b-der": "./tests/certs/cert-chain-resolver.remcokoopmans.com.der.p7b",
+    "p7b-pem": "./tests/certs/cert-chain-resolver.remcokoopmans.com.pem.p7b",
+    "der": "./tests/certs/cert-chain-resolver.remcokoopmans.com.der",
+}
 BUNDLE_FIXTURES = [
     list(map(_add_cert_objects_to_chain, bundle)) for bundle in _TEST_BUNDLES
 ]

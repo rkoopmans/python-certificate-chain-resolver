@@ -1,4 +1,4 @@
-from io import StringIO
+from io import BytesIO
 import pytest
 
 from cert_chain_resolver.cli import cli
@@ -12,10 +12,10 @@ except NameError:
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_cert_returns_completed_chain(capsys, bundle):
-    f = StringIO(unicode(bundle[0]["cert_pem"]))
+    f = BytesIO(bundle[0]["cert_pem"])
 
     cli(cert=f)
 
     captured = unicode(capsys.readouterr().out)
-    expected = unicode("".join([x["cert_pem"] for x in bundle]))
+    expected = "".join([unicode(x["cert_pem"], "ascii") for x in bundle])
     assert captured == expected
