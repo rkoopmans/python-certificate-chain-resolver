@@ -1,9 +1,14 @@
-# Resolve certificate chains
+# Python certificate chain resolver
 
 [![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
 ![Tests](https://github.com/rkoopmans/python-certificate-chain-resolver/workflows/CI%20tests/badge.svg?branch=v1)
 
-Still in development
+Resolve / obtain the certificate intermediates of a x509 certificate. This tool writes the full bundle to stdout. 
+
+## Support
+
+* PKCS7, PEM and DER formats
+* LetsEncrypt
 
 ## Dependencies
 
@@ -63,11 +68,3 @@ Unit testing
 Re-run tests on file changes:
 
     $ make tests TEST_ARGS="-- -f"
-
-
-## Todo
-
-* support cross signed certificates, currently it only processes the first in a bundle
-* Verbose mode
-* More CLI flags
-* Pretty print detailed output
