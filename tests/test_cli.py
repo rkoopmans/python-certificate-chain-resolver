@@ -12,9 +12,7 @@ except NameError:
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_cert_returns_completed_chain(capsys, bundle):
-    f = BytesIO(bundle[0]["cert_pem"])
-
-    cli(cert=f)
+    cli(source=bundle[0]["cert_pem"])
 
     captured = unicode(capsys.readouterr().out)
     expected = "".join([unicode(x["cert_pem"], "ascii") for x in bundle])
