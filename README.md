@@ -2,24 +2,25 @@
 
 [![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
 ![Build](https://github.com/rkoopmans/python-certificate-chain-resolver/workflows/CI%20tests/badge.svg?branch=v1)
+[![Docs](https://readthedocs.org/projects/certificate-resolver/badge/?version=latest)](https://certificate-resolver.readthedocs.io/en/latest/)
 [![Downloads](https://static.pepy.tech/personalized-badge/cert-chain-resolver?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/cert-chain-resolver)
 ![Python)](https://img.shields.io/pypi/pyversions/cert-chain-resolver.svg)
+
 
 Resolve / obtain the certificate intermediates of a x509 certificate. This tool writes the full bundle to stdout. 
 
 ## Support
 
 * PKCS7, PEM and DER formats
-* LetsEncrypt
+* LetsEncrypt certificates
 
 ## Dependencies
 
 * cryptography
 
-## Python Support
+## Documentation
 
-* Python 2.7
-* Python 3.5, 3.6, 3.7, 3.8, 3.9, 3.10
+Read more on [readthedocs](https://certificate-resolver.readthedocs.io/en/latest/)
 
 ## Install
 

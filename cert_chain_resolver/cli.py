@@ -53,14 +53,14 @@ if __name__ == "__main__":
     pargs = parse_args()
     args = vars(pargs)
 
-    if args['source'] == '-':
+    if args["source"] == "-":
         if __is_py3__:
             source = sys.stdin.buffer
         else:
             source = sys.stdin
-        args['source'] = source.read()
+        args["source"] = source.read()
     else:
-        with open(args['source'], 'rb') as f:
-            args['source'] = f.read()
+        with open(args["source"], "rb") as f:
+            args["source"] = f.read()
 
     cli(**args)

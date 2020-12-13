@@ -21,6 +21,15 @@ def _download(url):
 
 
 def resolve(bytes_cert, _chain=None):
+    """ A recursive function that follows the CA issuer chain
+
+    Args:
+        bytes_cert (bytes): A DER/PKCS7/PEM certificate
+        _chain (:py:class:`CertificateChain <CertificateChain>`, optional): Chain to complete. Defaults to None.
+
+    Returns:
+        :py:class:`CertificateChain <CertificateChain>`: All resolved certificates in chain
+    """
     cert = load_bytes_to_x509(bytes_cert)
 
     if not _chain:

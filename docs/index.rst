@@ -6,11 +6,20 @@
 Certificate chain resolver
 ======================================================
 
-Release v\ |version|. (:ref:`Installation <install>`)
+
+Resolve / obtain the certificate intermediates of a x509 certificate. 
+
+
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+
+   installation
+   cli_usage
+   api
+   modules
+
 
 
 Indices and tables
