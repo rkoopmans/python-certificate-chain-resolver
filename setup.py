@@ -1,14 +1,19 @@
 import setuptools
+import os
+from cert_chain_resolver import __version__
 
-with open("README.md", "r") as fh:
+
+DIR = os.path.dirname(os.path.abspath(__file__))
+
+with open(os.path.join(DIR, "README.md"), "r") as fh:
     long_description = fh.read()
 
-with open("requirements.txt", "r") as fh:
+with open(os.path.join(DIR, "requirements.txt"), "r") as fh:
     reqs = fh.readlines()
 
 setuptools.setup(
     name="cert_chain_resolver",
-    version="0.2.2",
+    version=__version__,
     author="Remco Koopmans",
     author_email="me@remcokoopmans.com",
     description="Resolve / obtain the certificate intermediates of a x509 cert",
