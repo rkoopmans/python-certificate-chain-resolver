@@ -12,10 +12,12 @@ except NameError:
 
 class Cert(object):
     """The :class:`Cert <Cert>` object, which is a convenience
-    wrapper for interacting with the underlying x509 object
+    wrapper for interacting with the underlying :py:class:`cryptography.x509.Certificate` object
 
     Args:
-        x509 (x509) a cryptography.x509 object
+        x509_obj (:py:class:`cryptography.x509.Certificate`): An instance of :py:class:`cryptography.x509.Certificate`
+    Raises:
+        ValueError: given type is not an instance of :py:class:`cryptography.x509.Certificate`
     """
 
     _x509 = None
@@ -32,19 +34,23 @@ class Cert(object):
 
     @property
     def issuer(self):
+        """ str: RFC4515 formatted string of the issuer field from the underlying :py:class:`cryptography.x509.Certificate` object"""
         return self._x509.issuer.rfc4514_string()
 
     @property
     def subject(self):
+        """ str: RFC4515 formatted string of the subject field from the underlying :py:class:`cryptography.x509.Certificate` object"""
         return self._x509.subject.rfc4514_string()
 
     @property
     def common_name(self):
+        """ str: Extracted common name from the underlying :py:class:`cryptography.x509.Certificate` object"""
         for attr in self._x509.subject.get_attributes_for_oid(NameOID.COMMON_NAME):
             return attr.value
 
     @property
     def subject_alternative_names(self):
+        """ list(str): Extracted x509 Extensions from the :py:class:`cryptography.x509.Certificate` object"""
         names = []
         try:
             ext = self._x509.extensions.get_extension_for_oid(
@@ -57,6 +63,7 @@ class Cert(object):
 
     @property
     def is_ca(self):
+        """ bool: Checks whether the Certificate Authority bit has been set"""
         is_ca = False
         try:
             ext = self._x509.extensions.get_extension_for_oid(
@@ -69,30 +76,37 @@ class Cert(object):
 
     @property
     def is_root(self):
+        """ bool: Checks whether the certificate is a root"""
         return self.subject == self.issuer
 
     @property
     def serial(self):
+        """ str: gets the serial from the underlying :py:class:`cryptography.x509.Certificate` object"""
         return self._x509.serial_number
 
     @property
     def signature_hash_algorithm(self):
+        """ str: gets the signature hashing algorithm name from the underlying :py:class:`cryptography.x509.Certificate` object"""
         return self._x509.signature_hash_algorithm.name
 
     @property
     def not_valid_before(self):
+        """ :py:class:`datetime.datetime`: from the underlying :py:class:`cryptography.x509.Certificate` object"""
         return self._x509.not_valid_before
 
     @property
     def not_valid_after(self):
+        """ :py:class:`datetime.datetime`: from the underlying :py:class:`cryptography.x509.Certificate` object"""
         return self._x509.not_valid_after
 
     @property
     def fingerprint(self):
+        """ str: ascii encoded sha256 fingerprint by calling :py:func:`get_fingerprint`"""
         return self.get_fingerprint(hashes.SHA256)
 
     @property
     def ca_issuer_access_location(self):
+        """ str: a URL that contains the CA issuer certificate"""
         access_location = None
         try:
             aias = self._x509.extensions.get_extension_for_oid(
@@ -106,16 +120,37 @@ class Cert(object):
         return access_location
 
     def get_fingerprint(self, _hash=hashes.SHA256):
+        """ Get fingerprint of the certificate
+
+        Args:
+            _hash (:py:class:`cryptography.hazmat.primitives.hashes`, optional): Hasher to use. Defaults to hashes.SHA256.
+
+        Returns:
+            str: ascii formatted fingerprint
+        """
         binary = self._x509.fingerprint(_hash())
         txt = binascii.hexlify(binary).decode("ascii")
         return txt
 
     def export(self, encoding=Encoding.PEM):
+        """Export the :py:class:`cryptography.x509.Certificate` object"
+
+        Args:
+            encoding (:py:class:`cryptography.hazmat.primitives.serialization.Encoding`, optional): The output format. Defaults to Encoding.PEM.
+
+        Returns:
+            str: ascii formatted
+        """
         encoded = unicode(self._x509.public_bytes(encoding), "ascii")
         return encoded
 
 
 class CertificateChain(object):
+    """ Creates an iterable that contains a list of :class:`Cert <Cert>` objects.
+
+    Args:
+        chain (:py:class:`CertificateChain <CertificateChain>`, optional): Create a new CertificateChain based on this chain. Defaults to None.
+    """
 
     _chain = None
 
@@ -135,9 +170,11 @@ class CertificateChain(object):
 
     @property
     def leaf(self):
+        """ First :class:`Cert <Cert>`: in the chain. Also known as the 'leaf'"""
         return self._chain[0]
 
     @property
     def intermediates(self):
+        """ A new :class:`CertificateChain <CertificateChain>` object with only intermediate certificates """
         new_chain = [x for x in self._chain if (x.is_ca and not x.is_root)]
         return self.__class__(chain=new_chain)

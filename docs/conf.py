@@ -16,13 +16,16 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 
+import cert_chain_resolver
+import sphinx_rtd_theme
+
+
 # -- Project information -----------------------------------------------------
 
 project = 'Certificate chain resolver'
 copyright = '2020, Remco Koopmans'
 author = 'Remco Koopmans'
 
-import cert_chain_resolver
 # The full version, including alpha/beta/rc tags
 release = cert_chain_resolver.__version__
 
@@ -33,6 +36,9 @@ release = cert_chain_resolver.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx_rtd_theme",
+    "sphinx.ext.napoleon",
+
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
@@ -52,7 +58,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -61,5 +67,5 @@ html_static_path = ['_static']
 
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
-    # "urllib3": ("https://urllib3.readthedocs.io/en/latest", None),
+    "cryptography": ("https://cryptography.io/en/latest", None),
 }
