@@ -1,7 +1,9 @@
 # Python certificate chain resolver
 
 [![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
-![Tests](https://github.com/rkoopmans/python-certificate-chain-resolver/workflows/CI%20tests/badge.svg?branch=v1)
+![Build](https://github.com/rkoopmans/python-certificate-chain-resolver/workflows/CI%20tests/badge.svg?branch=v1)
+[![Downloads](https://static.pepy.tech/personalized-badge/cert-chain-resolver?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/cert-chain-resolver)
+![Python)](https://img.shields.io/pypi/pyversions/cert-chain-resolver.svg)
 
 Resolve / obtain the certificate intermediates of a x509 certificate. This tool writes the full bundle to stdout. 
 
