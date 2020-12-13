@@ -1,12 +1,11 @@
 import argparse
 import sys
 from cert_chain_resolver.resolver import resolve
+from cert_chain_resolver import __is_py3__
 
 
-def cli(cert=None, depth=None, info=None):
-    cert = cert.read()
-
-    certs = resolve(cert)
+def cli(source=None, depth=None, info=None):
+    certs = resolve(source)
     if info:
         import pprint
 
@@ -34,10 +33,11 @@ Examples:
     """,
     )
     parser.add_argument(
-        "cert",
+        "file_name",
         nargs="?",
         default="-",
-        type=argparse.FileType("rb"),
+        dest="source",
+        type=str,
         help="file formatted as PEM",
     )
     parser.add_argument(
@@ -52,4 +52,15 @@ if __name__ == "__main__":
 
     pargs = parse_args()
     args = vars(pargs)
+
+    if args['source'] == '-':
+        if __is_py3__:
+            source = sys.stdin.buffer
+        else:
+            source = sys.stdin
+        args['source'] = source.read()
+    else:
+        with open(args['source'], 'rb') as f:
+            args['source'] = f.read()
+
     cli(**args)
