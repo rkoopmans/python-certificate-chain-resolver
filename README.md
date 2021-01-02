@@ -55,6 +55,9 @@ from stdin:
 
     $ cat certificate.crt | python -m cert_chain_resolver.cli > bundle.crt
 
+### Print the details of each certificate in resolved chain
+
+    $ cert_chain_resolver cert.pem --info
 
 ## Development
 
