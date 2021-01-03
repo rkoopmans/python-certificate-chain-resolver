@@ -1,6 +1,11 @@
 # Changelog 
 
-## 1.0.0
+## 1.0.1
+
+* Bugfix: Support windows newlines in PEM files
+* Added python version classifiers to setup.py
+
+## 1.0.0 (deleted)
 
 The project has been refractored and here is the first major release!
 
