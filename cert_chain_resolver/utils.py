@@ -8,7 +8,7 @@ from cert_chain_resolver.models import Cert
 
 
 def load_ascii_to_x509(bytes_input, ascii_input):
-    first_line = ascii_input.split("\n", 1)[0]
+    first_line = ascii_input.splitlines()[0]
     if first_line == "-----BEGIN PKCS7-----":
         return load_pem_pkcs7_certificates(bytes_input)[0]
     elif first_line == "-----BEGIN CERTIFICATE-----":
