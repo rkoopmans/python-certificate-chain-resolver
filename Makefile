@@ -20,9 +20,10 @@ $(PIP):
 	$(dir $(PIP))/python setup.py bdist_wheel  --universal
 	touch $@
 
-build: .build
+build: tests .build
 
-publish: tests .build
+publish: .build
+	twine check dist/*
 	twine upload dist/*
 
 tests: .reqs .reqs_dev
