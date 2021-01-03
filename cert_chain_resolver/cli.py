@@ -62,7 +62,7 @@ Examples:
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     if sys.stdin.isatty() and len(sys.argv) == 1:
         sys.argv += ["-h"]
 
@@ -85,3 +85,7 @@ if __name__ == "__main__":
             cli_args["file_bytes"] = f.read()
 
     cli(**cli_args)
+
+
+if __name__ == "__main__":
+    main()
