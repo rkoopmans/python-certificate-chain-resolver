@@ -22,7 +22,7 @@ setuptools.setup(
     url="https://github.com/rkoopmans/python-certificate-chain-resolver",
     packages=setuptools.find_packages(),
     install_requires=reqs,
-    entry_points={"console_scripts": ["cert-chain-resolver = cli:cli"]},
+    entry_points={"console_scripts": ["cert-chain-resolver = cert_chain_resolver.cli:main"]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 2.7",
