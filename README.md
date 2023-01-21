@@ -4,7 +4,10 @@
 [![CI](https://github.com/rkoopmans/python-certificate-chain-resolver/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rkoopmans/python-certificate-chain-resolver/actions/workflows/ci-cd.yml)
 [![Docs](https://readthedocs.org/projects/certificate-resolver/badge/?version=latest)](https://certificate-resolver.readthedocs.io/en/latest/)
 [![Downloads](https://static.pepy.tech/personalized-badge/cert-chain-resolver?period=total&units=international_system&left_color=black&right_color=blue&left_text=Downloads)](https://pepy.tech/project/cert-chain-resolver)
-![Python)](https://img.shields.io/pypi/pyversions/cert-chain-resolver.svg)
+[![Python)](https://img.shields.io/pypi/pyversions/cert-chain-resolver.svg)](https://pypi.org/project/cert-chain-resolver/)
+[![PyPI - Wheel](https://img.shields.io/pypi/wheel/cert-chain-resolver)](https://pypi.org/cert-chain-resolver/)
+[![PyPI](https://img.shields.io/pypi/v/cert-chain-resolver)](https://pypi.org/project/cert-chain-resolver/#history)
+
 
 
 Resolve / obtain the certificate intermediates of a x509 certificate using the CLI or python API.
