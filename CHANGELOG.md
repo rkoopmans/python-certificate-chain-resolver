@@ -1,5 +1,10 @@
 # Changelog 
 
+## 1.0.2
+
+* Add support for python 3.11
+* Updated python version classifiers in setup.py
+
 ## 1.0.1
 
 * Bugfix: Support windows newlines in PEM files
