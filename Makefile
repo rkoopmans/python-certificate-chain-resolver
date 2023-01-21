@@ -16,16 +16,6 @@ $(PIP):
 	$(PIP) install -r requirements_dev.txt
 	@touch $@
 
-.build: .reqs
-	$(dir $(PIP))/python setup.py bdist_wheel  --universal
-	touch $@
-
-build: tests .build
-
-publish: .build
-	twine check dist/*
-	twine upload dist/*
-
 tests: .reqs .reqs_dev
 	./env/bin/tox $(TEST_ARGS)
 
@@ -33,4 +23,4 @@ coverage:
 	./env/bin/py.test --cov-report html --cov=cert_chain_resolver --cov-fail-under=90
 
 clean:
-	rm -rf dist .build .reqs_dev .reqs $(ENV_DIR) .tox
+	rm -rf .reqs_dev .reqs $(ENV_DIR) .tox
