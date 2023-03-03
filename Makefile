@@ -1,7 +1,7 @@
 ENV_DIR = ./env
 PIP := $(ENV_DIR)/bin/pip
 
-.PHONY: all tests coverage
+.PHONY: all tests coverage clean pyclean
 
 all: tests
 
@@ -22,5 +22,8 @@ tests: .reqs .reqs_dev
 coverage:
 	./env/bin/py.test --cov-report html --cov=cert_chain_resolver --cov-fail-under=90
 
-clean:
+pyclean:
+	find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
+
+clean: pyclean
 	rm -rf .reqs_dev .reqs $(ENV_DIR) .tox
