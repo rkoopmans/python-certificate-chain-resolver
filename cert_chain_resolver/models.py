@@ -17,7 +17,7 @@ class Cert(object):
     Args:
         x509_obj (:py:class:`cryptography.x509.Certificate`): An instance of :py:class:`cryptography.x509.Certificate`
     Raises:
-        ValueError: given type is not an instance of :py:class:`cryptography.x509.Certificate`
+        TypeError: given type is not an instance of :py:class:`cryptography.x509.Certificate`
     """
 
     _x509 = None
@@ -126,7 +126,7 @@ class Cert(object):
             _hash (:py:class:`cryptography.hazmat.primitives.hashes`, optional): Hasher to use. Defaults to hashes.SHA256.
 
         Returns:
-            str: ascii formatted fingerprint
+            str: hex representation of the fingerprint
         """
         binary = self._x509.fingerprint(_hash())
         txt = binascii.hexlify(binary).decode("ascii")
