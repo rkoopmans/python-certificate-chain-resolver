@@ -4,7 +4,6 @@ from cryptography.hazmat.primitives.serialization.pkcs7 import (
     load_der_pkcs7_certificates,
 )
 from cert_chain_resolver.exceptions import ImproperlyFormattedCert
-from cert_chain_resolver.models import Cert
 
 
 def load_ascii_to_x509(bytes_input, ascii_input):
@@ -24,12 +23,8 @@ def load_der_to_x509(bytes_input):
 
 
 def load_bytes_to_x509(bytes_input):
-    cert = None
-
     try:
         pem = bytes_input.decode("ascii")
-        cert = load_ascii_to_x509(bytes_input, pem)
+        return load_ascii_to_x509(bytes_input, pem)
     except UnicodeDecodeError:
-        cert = load_der_to_x509(bytes_input)
-
-    return Cert(cert)
+        return load_der_to_x509(bytes_input)

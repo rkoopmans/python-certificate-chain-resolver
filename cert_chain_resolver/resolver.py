@@ -1,7 +1,6 @@
 from contextlib import closing
 
-from cert_chain_resolver.models import CertificateChain
-from cert_chain_resolver.utils import load_bytes_to_x509
+from cert_chain_resolver.models import CertificateChain, Cert
 
 try:
     from urllib.request import urlopen, Request
@@ -30,7 +29,7 @@ def resolve(bytes_cert, _chain=None):
     Returns:
         :py:class:`CertificateChain <CertificateChain>`: All resolved certificates in chain
     """
-    cert = load_bytes_to_x509(bytes_cert)
+    cert = Cert.load(bytes_cert)
 
     if not _chain:
         _chain = CertificateChain()

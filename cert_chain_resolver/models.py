@@ -1,3 +1,4 @@
+from cert_chain_resolver.utils import load_bytes_to_x509
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
 from cryptography.hazmat.primitives import hashes
@@ -143,6 +144,20 @@ class Cert(object):
         """
         encoded = unicode(self._x509.public_bytes(encoding), "ascii")
         return encoded
+
+    @classmethod
+    def load(cls, bytes_input):
+        """
+        Create a :class:`Cert <Cert>` object 
+
+        Args:
+            bytes_input :py:class:`bytes` PEM or DER
+
+        Raises:
+            :class:`ImproperlyFormattedCert <ImproperlyFormattedCert>`
+        """
+        x509 = load_bytes_to_x509(bytes_input)
+        return Cert(x509)
 
 
 class CertificateChain(object):
