@@ -20,7 +20,7 @@ def _download(url):
 
 
 def resolve(bytes_cert, _chain=None):
-    """ A recursive function that follows the CA issuer chain
+    """A recursive function that follows the CA issuer chain
 
     Args:
         bytes_cert (bytes): A DER/PKCS7/PEM certificate

@@ -13,7 +13,11 @@ def _print_chain_details(chain):
         print("NotAfter:".ljust(20) + cert.not_valid_after.isoformat())
         print("Serial:".ljust(20) + str(cert.serial))
         print("Sha256Fingeprint:".ljust(20) + str(cert.fingerprint))
-        print("CAIssuerLoc:".ljust(20) + cert.ca_issuer_access_location if cert.ca_issuer_access_location else "")
+        print(
+            "CAIssuerLoc:".ljust(20) + cert.ca_issuer_access_location
+            if cert.ca_issuer_access_location
+            else ""
+        )
         print("Is root:".ljust(20) + repr(cert.is_root))
         print("Is CA:".ljust(20) + repr(cert.is_ca))
         print("Domains:")
@@ -36,6 +40,7 @@ def cli(file_bytes=None, show_details=None):
         for i, c in enumerate([chain.leaf] + list(chain.intermediates), 1):
             sys.stderr.write(str(i) + ". " + repr(c) + "\n")
 
+
 def parse_args():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -54,7 +59,11 @@ Examples:
     """,
     )
     parser.add_argument(
-        "file_name", nargs="?", default="-", type=str, help="file formatted as PEM",
+        "file_name",
+        nargs="?",
+        default="-",
+        type=str,
+        help="file formatted as PEM",
     )
     parser.add_argument(
         "-i", "--info", action="store_true", help="Print chain derived information"
