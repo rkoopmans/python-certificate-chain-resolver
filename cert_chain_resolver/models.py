@@ -197,6 +197,11 @@ class CertificateChain(object):
         new_chain = [x for x in self._chain if (x.is_ca and not x.is_root)]
         return self.__class__(chain=new_chain)
 
+    @property
+    def root(self):
+        """Last :class:`Cert <Cert>`: in the chain  that can be identified as root or None if no root is present"""
+        if self._chain[-1].is_root:
+            return self._chain[-1]
 
     @classmethod
     def load_from_pem(cls, input_bytes):

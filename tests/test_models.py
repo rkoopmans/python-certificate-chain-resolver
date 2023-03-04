@@ -58,16 +58,20 @@ def test_chaincontainer_props(mocker):
     intermediate2 = mocker.MagicMock()
     intermediate2.is_ca = True
     intermediate2.is_root = False
+    root = mocker.MagicMock()
+    root.is_ca = True
+    root.is_root = True
 
     c = CertificateChain()
-    for cert in [leaf, intermediate1, intermediate2]:
+    for cert in [leaf, intermediate1, intermediate2, root]:
         c += cert
 
     assert leaf == c.leaf
+    assert root == c.root
     assert [intermediate1, intermediate2] == list(c.intermediates)
-    assert [leaf, intermediate1, intermediate2] == [x for x in c]
-    assert [leaf, intermediate1, intermediate2] == list(c)
-    assert 3 == len(c)
+    assert [leaf, intermediate1, intermediate2, root] == [x for x in c]
+    assert [leaf, intermediate1, intermediate2, root] == list(c)
+    assert 4 == len(c)
 
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
