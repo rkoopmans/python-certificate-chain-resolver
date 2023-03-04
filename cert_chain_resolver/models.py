@@ -1,4 +1,4 @@
-from cert_chain_resolver.utils import load_bytes_to_x509
+from cert_chain_resolver.utils import load_ascii_to_x509, load_bytes_to_x509
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
 from cryptography.hazmat.primitives import hashes
@@ -32,6 +32,9 @@ class Cert(object):
         return '<Cert common_name="{0}" subject="{1}" issuer="{2}">'.format(
             self.common_name, self.subject, self.issuer
         )
+
+    def __eq__(self, other):
+        return self.fingerprint == other.fingerprint
 
     @property
     def issuer(self):
@@ -193,3 +196,20 @@ class CertificateChain(object):
         """A new :class:`CertificateChain <CertificateChain>` object with only intermediate certificates"""
         new_chain = [x for x in self._chain if (x.is_ca and not x.is_root)]
         return self.__class__(chain=new_chain)
+
+
+    @classmethod
+    def load_from_pem(cls, input_bytes):
+        """ Create a :py:class:`CertificateChain <CertificateChain>` object from a PEM formatted file """
+        begin = b'-----BEGIN CERTIFICATE-----\n'
+        chain = cls()
+        for strip_pem in filter(len, input_bytes.split(begin)):
+            pem = begin + strip_pem
+            chain += Cert(load_ascii_to_x509(pem, pem.decode('ascii')))
+
+        if chain.leaf.is_ca and not chain._chain[-1].is_ca:
+            # if CA bit is not set on the last certificate, reverse the chain
+            chain._chain.reverse()
+        return chain
+
+

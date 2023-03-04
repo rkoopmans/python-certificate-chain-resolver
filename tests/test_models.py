@@ -68,3 +68,19 @@ def test_chaincontainer_props(mocker):
     assert [leaf, intermediate1, intermediate2] == [x for x in c]
     assert [leaf, intermediate1, intermediate2] == list(c)
     assert 3 == len(c)
+
+
+@pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
+def test_certificatechain_can_construct_from_pem(bundle):
+    pem_bundle = b"".join([x['cert_pem'] for x in bundle])
+
+    chain = CertificateChain.load_from_pem(pem_bundle)
+    assert list(chain) == [Cert(x['cert_x509']) for x in bundle]
+
+
+@pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
+def test_certificatechain_constructs_from_pem_in_order(bundle):
+    pem_bundle = b"".join([x['cert_pem'] for x in reversed(bundle)])
+
+    chain = CertificateChain.load_from_pem(pem_bundle)
+    assert list(chain) == [Cert(x['cert_x509']) for x in bundle]
