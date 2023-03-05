@@ -8,3 +8,15 @@ class ImproperlyFormattedCert(CertificateChainResolverError):
 
 class MissingCertProperty(CertificateChainResolverError):
     pass
+
+
+class CertificateVerificationError(CertificateChainResolverError):
+    pass
+
+
+class CertifiNotInstalled(CertificateChainResolverError):
+    pass
+
+
+class RootCertificateNotFound(CertificateChainResolverError):
+    pass

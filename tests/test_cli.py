@@ -11,10 +11,13 @@ except NameError:
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_cert_returns_completed_chain(capsys, bundle):
+    # FIXME: Test with root inclusion!
     cli(file_bytes=bundle[0]["cert_pem"])
 
     captured = unicode(capsys.readouterr().out)
-    expected = "".join([unicode(x["cert_pem"], "ascii") for x in bundle])
+    expected = "".join(
+        [unicode(x["cert_pem"], "ascii") for x in bundle if x["type"] != "root"]
+    )
     assert captured == expected
 
 

@@ -1,9 +1,17 @@
-from cert_chain_resolver.exceptions import MissingCertProperty
+from cert_chain_resolver.exceptions import (
+    CertificateVerificationError,
+    MissingCertProperty,
+)
 from cert_chain_resolver.utils import load_ascii_to_x509, load_bytes_to_x509
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.serialization import Encoding
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
+from cryptography.hazmat.primitives.asymmetric.ec import ECDSA, EllipticCurvePublicKey
+from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+
+
 import binascii
 
 
@@ -39,8 +47,13 @@ class Cert:
 
     def __repr__(self):
         # type: () -> str
+        try:
+            common_name = self.common_name
+        except MissingCertProperty:
+            common_name = None
+
         return '<Cert common_name="{0}" subject="{1}" issuer="{2}">'.format(
-            self.common_name, self.subject, self.issuer
+            common_name, self.subject, self.issuer
         )
 
     def __eq__(self, other):
@@ -176,6 +189,34 @@ class Cert:
         txt = binascii.hexlify(binary).decode("ascii")
         return txt
 
+    def is_issued_by(self, other):
+        # type: (Cert) -> bool
+        """Verify if certificate is issued by the passed CA cert"""
+        try:
+            public_key = other._x509.public_key()
+            hash_algorithm = self._x509.signature_hash_algorithm
+            if not hash_algorithm:
+                raise MissingCertProperty("No hash algorithm found")
+            if isinstance(public_key, RSAPublicKey):
+                public_key.verify(
+                    self._x509.signature,
+                    self._x509.tbs_certificate_bytes,
+                    PKCS1v15(),
+                    hash_algorithm,
+                )
+                return True
+            elif isinstance(public_key, EllipticCurvePublicKey):
+                public_key.verify(
+                    self._x509.signature,
+                    self._x509.tbs_certificate_bytes,
+                    ECDSA(hash_algorithm),
+                )
+                return True
+        except Exception:
+            pass
+
+        return False
+
     def export(self, encoding=Encoding.PEM):
         # type: (Encoding) -> str
         """Export the :py:class:`cryptography.x509.Certificate` object" as text
@@ -186,8 +227,8 @@ class Cert:
         Returns:
             ascii formatted
         """
-        encoded = self._x509.public_bytes(encoding)
-        return encoded.decode(encoding="ascii")
+        encoded = unicode(self._x509.public_bytes(encoding), "ascii")
+        return encoded
 
     @classmethod
     def load(cls, bytes_input):
@@ -266,7 +307,6 @@ class CertificateChain:
         for strip_pem in filter(len, input_bytes.split(begin)):
             pem = begin + strip_pem
             chain += Cert(load_ascii_to_x509(pem))
-
         if chain.leaf.is_ca and not chain._chain[-1].is_ca:
             # if CA bit is not set on the last certificate, reverse the chain
             chain._chain.reverse()

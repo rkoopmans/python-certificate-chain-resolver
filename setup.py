@@ -28,6 +28,9 @@ setuptools.setup(
     },
     license="MIT",
     license_file="LICENSE.txt",
+    extras_require={
+        'ca-root': ["certifi"]
+    },
     classifiers=[
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
