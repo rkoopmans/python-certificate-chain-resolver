@@ -76,15 +76,23 @@ def test_chaincontainer_props(mocker):
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_certificatechain_can_construct_from_pem(bundle):
-    pem_bundle = b"".join([x['cert_pem'] for x in bundle])
+    pem_bundle = b"".join([x["cert_pem"] for x in bundle])
 
     chain = CertificateChain.load_from_pem(pem_bundle)
-    assert list(chain) == [Cert(x['cert_x509']) for x in bundle]
+    assert list(chain) == [Cert(x["cert_x509"]) for x in bundle]
 
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_certificatechain_constructs_from_pem_in_order(bundle):
-    pem_bundle = b"".join([x['cert_pem'] for x in reversed(bundle)])
+    pem_bundle = b"".join([x["cert_pem"] for x in reversed(bundle)])
 
     chain = CertificateChain.load_from_pem(pem_bundle)
-    assert list(chain) == [Cert(x['cert_x509']) for x in bundle]
+    assert list(chain) == [Cert(x["cert_x509"]) for x in bundle]
+
+
+@pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
+def test_certificate_is_issued_by_method(bundle):
+    leaf = Cert(bundle[0]['cert_x509'])
+    intermediate = Cert(bundle[1]['cert_x509'])
+
+    assert leaf.is_issued_by(intermediate) 

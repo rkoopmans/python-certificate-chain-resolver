@@ -136,6 +136,30 @@ class Cert(object):
         txt = binascii.hexlify(binary).decode("ascii")
         return txt
 
+    def is_issued_by(self, other):
+        """ Verify if certificate is issued by the passed CA cert
+
+        Args:
+            other (:class:`Cert <Cert>`)
+
+        Returns:
+            bool: True if certificate is issued by the other
+        """
+        otherr: x509.Certificate = other._x509
+        print(self._x509.signature_algorithm_oid)
+        print(otherr.signature_algorithm_oid)
+
+        print(otherr.public_key())
+        print(otherr.signature)
+        return False
+        if self.issuer != other.subject:
+            return False
+        if self._x509.signature_algorithm_oid != otherr.signature_algorithm_oid:
+            return False
+        return True
+
+
+
     def export(self, encoding=Encoding.PEM):
         """Export the :py:class:`cryptography.x509.Certificate` object"
 
@@ -147,7 +171,7 @@ class Cert(object):
         """
         encoded = unicode(self._x509.public_bytes(encoding), "ascii")
         return encoded
-
+    
     @classmethod
     def load(cls, bytes_input):
         """
@@ -205,16 +229,14 @@ class CertificateChain(object):
 
     @classmethod
     def load_from_pem(cls, input_bytes):
-        """ Create a :py:class:`CertificateChain <CertificateChain>` object from a PEM formatted file """
-        begin = b'-----BEGIN CERTIFICATE-----\n'
+        """Create a :py:class:`CertificateChain <CertificateChain>` object from a PEM formatted file"""
+        begin = b"-----BEGIN CERTIFICATE-----\n"
         chain = cls()
         for strip_pem in filter(len, input_bytes.split(begin)):
             pem = begin + strip_pem
-            chain += Cert(load_ascii_to_x509(pem, pem.decode('ascii')))
+            chain += Cert(load_ascii_to_x509(pem, pem.decode("ascii")))
 
         if chain.leaf.is_ca and not chain._chain[-1].is_ca:
             # if CA bit is not set on the last certificate, reverse the chain
             chain._chain.reverse()
         return chain
-
-

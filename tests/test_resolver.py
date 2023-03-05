@@ -10,7 +10,7 @@ def test_resolve_works_recursively(monkeypatch, mocker):
 
     resolve_mock = mocker.MagicMock()
     resolve_mock.side_effect = [leaf, intermediate, ca]
-    monkeypatch.setattr(Cert, 'load', resolve_mock)
+    monkeypatch.setattr(Cert, "load", resolve_mock)
 
     monkeypatch.setattr(
         "cert_chain_resolver.resolver._download",
