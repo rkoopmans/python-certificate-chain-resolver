@@ -1,5 +1,12 @@
 # Changelog 
 
+
+## 1.1.0
+
+* Add a method to Cert to load a cert directly with Cert.load((PEM OR DER bytes))
+* Add a method to CertificateChain to load a chain from a PEM bytes CertificateChain.load_from_pem()
+* Add a root property to CertificateChain
+
 ## 1.0.2
 
 * Add support for python 3.11
