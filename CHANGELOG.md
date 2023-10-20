@@ -1,5 +1,9 @@
 # Changelog 
 
+## 1.1.1
+* Added the MIT license to the repository
+* Added classifiers for supporting python 3.12
+* Added six as a dependency for python 2.7 support (Maybe we have to remove support?)
 
 ## 1.1.0
 
