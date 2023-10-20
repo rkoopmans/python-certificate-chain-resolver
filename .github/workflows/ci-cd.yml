@@ -9,12 +9,29 @@ on:
     branches: [ master ]
 
 jobs:
-  Test:
+  Test-python-27:
+    runs-on: ubuntu-20.04
+    container:
+      image: python:2.7.18-buster
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install -r requirements.txt  && \
+        python -m pip install -r requirements_dev.txt
+    - name: Test with pytest
+      run: |
+        pytest
 
+  Test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['2.7', '3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', '3.12']
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
