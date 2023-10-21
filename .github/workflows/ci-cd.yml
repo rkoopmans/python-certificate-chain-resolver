@@ -2,11 +2,11 @@ name: CI/CD
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, develop ]
     tags:
       - '*'
   pull_request:
-    branches: [ master ]
+    branches: [ master, develop ]
 
 jobs:
   Test-python-27:
@@ -45,6 +45,24 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+
+  mypy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install mypy -rrequirements_dev.txt -rrequirements.txt
+    - name: mypy static checker
+      run: |
+        mypy {cert_chain_resolver,tests}
 
   Publish:
     if: |
