@@ -1,8 +1,6 @@
 import datetime
 from cryptography import x509
-import pytest
 import itertools
-import six
 
 
 def _add_cert_objects_to_chain(cert):
@@ -110,7 +108,7 @@ CERT_FIXTURES = list(itertools.chain(*BUNDLE_FIXTURES))
 
 
 def certfixture_to_id(fixt):
-    """ pytest helper to create a human readable string when using parametrize """
+    """pytest helper to create a human readable string when using parametrize"""
     if isinstance(fixt, dict):
         return fixt["type"] + ":" + fixt["name"]
     elif isinstance(fixt, list):

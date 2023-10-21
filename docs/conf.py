@@ -42,6 +42,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
+    "sphinx-autodoc-typehints",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -69,3 +70,5 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "cryptography": ("https://cryptography.io/en/latest", None),
 }
+
+always_document_param_types = True

@@ -1,11 +1,10 @@
-from io import BytesIO
 import pytest
 
 from cert_chain_resolver.cli import cli
-from .fixtures import CERT_FIXTURES, BUNDLE_FIXTURES, certfixture_to_id
+from .fixtures import BUNDLE_FIXTURES, certfixture_to_id
 
 try:
-    unicode
+    unicode  # type: ignore
 except NameError:
     unicode = str
 

@@ -5,29 +5,37 @@ from cert_chain_resolver.models import CertificateChain, Cert
 try:
     from urllib.request import urlopen, Request
 except ImportError:
-    from urllib2 import urlopen, Request
+    from urllib2 import urlopen, Request  # type: ignore
 
 try:
-    unicode
+    unicode  # type: ignore
 except NameError:
     unicode = str
 
+try:
+    from typing import Any, Optional
+except ImportError:
+    pass
+
 
 def _download(url):
+    # type: (str) -> Any
     req = Request(url, headers={"User-Agent": "Cert/fixer"})
+
     with closing(urlopen(req)) as resp:
         return resp.read()
 
 
 def resolve(bytes_cert, _chain=None):
+    # type: (bytes, Optional[CertificateChain]) -> CertificateChain
     """A recursive function that follows the CA issuer chain
 
     Args:
-        bytes_cert (bytes): A DER/PKCS7/PEM certificate
-        _chain (:py:class:`CertificateChain <CertificateChain>`, optional): Chain to complete. Defaults to None.
+        bytes_cert: A DER/PKCS7/PEM certificate
+        _chain: Chain to complete. Defaults to None.
 
     Returns:
-        :py:class:`CertificateChain <CertificateChain>`: All resolved certificates in chain
+        All resolved certificates in chain
     """
     cert = Cert.load(bytes_cert)
 
