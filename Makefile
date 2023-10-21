@@ -1,7 +1,7 @@
 ENV_DIR = ./env
 PIP := $(ENV_DIR)/bin/pip
 
-.PHONY: all tests coverage clean pyclean
+.PHONY: all tests coverage clean pyclean docs
 
 all: tests
 
@@ -16,8 +16,16 @@ $(PIP):
 	$(PIP) install -r requirements_dev.txt
 	@touch $@
 
+.reqs_docs: .reqs requirements_docs.txt
+	$(PIP) install -r requirements_docs.txt
+	touch $@
+
 tests: .reqs .reqs_dev
 	./env/bin/tox $(TEST_ARGS)
+
+docs: .reqs .reqs_docs
+	./env/bin/sphinx-build docs docs/_build
+
 
 coverage:
 	./env/bin/py.test --cov-report html --cov=cert_chain_resolver --cov-fail-under=90

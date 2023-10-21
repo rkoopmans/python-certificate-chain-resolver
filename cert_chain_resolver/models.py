@@ -25,7 +25,7 @@ class Cert:
     wrapper for interacting with the underlying :py:class:`cryptography.x509.Certificate` object
 
     Args:
-        x509_obj (:py:class:`cryptography.x509.Certificate`): An instance of :py:class:`cryptography.x509.Certificate`
+        x509_obj: An instance of :py:class:`cryptography.x509.Certificate`
     Raises:
         TypeError: given type is not an instance of :py:class:`cryptography.x509.Certificate`
     """

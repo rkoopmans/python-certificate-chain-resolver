@@ -16,8 +16,8 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 
-import cert_chain_resolver
-import sphinx_rtd_theme
+import cert_chain_resolver  # noqa: E402
+import sphinx_rtd_theme   # noqa: E402, F401
 
 
 # -- Project information -----------------------------------------------------
@@ -42,7 +42,6 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
-    "sphinx-autodoc-typehints",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -71,4 +70,6 @@ intersphinx_mapping = {
     "cryptography": ("https://cryptography.io/en/latest", None),
 }
 
-always_document_param_types = True
+
+# autodoc_typehints = 
+autodoc_typehints_format = 'short'

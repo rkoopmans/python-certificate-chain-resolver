@@ -6,3 +6,4 @@
 .coverage
 htmlcov
 docs/_build
+.reqs_docs

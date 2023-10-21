@@ -29,7 +29,8 @@ def _print_chain_details(chain):
         print("")
 
 
-def cli(file_bytes=None, show_details=None):
+def cli(file_bytes, show_details=False):
+    # type: (bytes, bool) -> None
     chain = resolve(file_bytes)
     if show_details:
         _print_chain_details(chain)
