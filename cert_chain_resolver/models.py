@@ -9,6 +9,7 @@ import binascii
 
 try:
     from typing import List, Union, Optional, Type, Iterator, TYPE_CHECKING
+
     if TYPE_CHECKING:
         import datetime
 except ImportError:
@@ -184,7 +185,7 @@ class Cert:
 
     def export(self, encoding=Encoding.PEM):
         # type: (Encoding) -> str
-        """Export the :py:class:`cryptography.x509.Certificate` object"
+        """Export the :py:class:`cryptography.x509.Certificate` object" as text
 
         Args:
             encoding (:py:class:`cryptography.hazmat.primitives.serialization.Encoding`, optional): The output format. Defaults to Encoding.PEM.
@@ -192,8 +193,8 @@ class Cert:
         Returns:
             ascii formatted
         """
-        encoded = unicode(self._x509.public_bytes(encoding), "ascii")
-        return encoded
+        encoded = self._x509.public_bytes(encoding)
+        return encoded.decode(encoding="ascii")
 
     @classmethod
     def load(cls, bytes_input):

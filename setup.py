@@ -21,10 +21,13 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/rkoopmans/python-certificate-chain-resolver",
     packages=setuptools.find_packages(),
+    package_data={"cert_chain_resolver": ["py.typed"]},
     install_requires=reqs,
-    entry_points={"console_scripts": ["cert-chain-resolver = cert_chain_resolver.cli:main"]},
-    license='MIT',
-    license_file='LICENSE.txt',
+    entry_points={
+        "console_scripts": ["cert-chain-resolver = cert_chain_resolver.cli:main"]
+    },
+    license="MIT",
+    license_file="LICENSE.txt",
     classifiers=[
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
