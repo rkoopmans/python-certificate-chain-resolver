@@ -85,8 +85,6 @@ class Cert:
             if isinstance(ext.value, x509.SubjectAlternativeName):
                 # Runtime check needed to ensure proper type hinting
                 return ext.value.get_values_for_type(x509.DNSName)
-            else:
-                raise MissingCertProperty("Could not get SubjectAlternativeNames")
         except x509.extensions.ExtensionNotFound:
             pass
         return []
@@ -102,7 +100,6 @@ class Cert:
             if isinstance(ext.value, x509.BasicConstraints):
                 # Runtime check needed to ensure proper type hinting
                 return ext.value.ca
-            raise MissingCertProperty("Could not extract CA bit from BasicConstraints")
         except x509.extensions.ExtensionNotFound:
             pass
         return False
@@ -155,16 +152,12 @@ class Cert:
             aias = self._x509.extensions.get_extension_for_oid(
                 ExtensionOID.AUTHORITY_INFORMATION_ACCESS
             )
-            if not isinstance(aias.value, x509.AuthorityInformationAccess):
+            if isinstance(aias.value, x509.AuthorityInformationAccess):
                 # Runtime check needed to ensure proper type hinting
-                raise MissingCertProperty(
-                    "Extracted AuthorityInformationAccess but couldnt determine instance"
-                )
-
-            for aia in aias.value:
-                if AuthorityInformationAccessOID.CA_ISSUERS == aia.access_method:
-                    access_location = aia.access_location.value  # type: str
-                    return access_location
+                for aia in aias.value:
+                    if AuthorityInformationAccessOID.CA_ISSUERS == aia.access_method:
+                        access_location = aia.access_location.value  # type: str
+                        return access_location
         except x509.extensions.ExtensionNotFound:
             pass
         return None

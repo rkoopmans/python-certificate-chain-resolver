@@ -1,4 +1,4 @@
 import sys
 
-__version__ = "1.1.1"
+__version__ = "1.2.0a1"
 __is_py3__ = sys.version_info >= (3, 0)

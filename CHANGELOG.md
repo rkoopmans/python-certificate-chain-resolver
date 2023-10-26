@@ -1,5 +1,12 @@
 # Changelog 
 
+## 1.2.0a1
+* Added mypy type hints
+* Introducing a new Exception (MissingCertProperty) when a property is requested and can't be found
+* All exceptions now inherit from CertificateChainResolverError
+* Removed six as a dependency
+* Moved the readthedocs documentation to the new platform (v2)
+
 ## 1.1.1
 * Added the MIT license to the repository
 * Added classifiers for supporting python 3.12
