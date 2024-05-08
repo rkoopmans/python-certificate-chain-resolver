@@ -19,3 +19,20 @@ def test_resolve_works_recursively(monkeypatch, mocker):
 
     chain = resolve(b"hoi")
     assert list(chain) == [leaf, intermediate, ca]
+
+
+def test_resolve_works_avoid_infinite_recursion(monkeypatch, mocker):
+    """Ensure that a certificate with refences to itself can be resolved correctly"""
+    leaf = mocker.Mock()
+
+    resolve_mock = mocker.MagicMock()
+    resolve_mock.side_effect = [leaf, leaf, leaf]
+    monkeypatch.setattr(Cert, "load", resolve_mock)
+
+    monkeypatch.setattr(
+        "cert_chain_resolver.resolver._download",
+        mocker.Mock(side_effect=["leaf", "leaf"]),
+    )
+
+    chain = resolve(b"hoi")
+    assert list(chain) == [leaf]

@@ -215,6 +215,7 @@ class CertificateChain:
     def __init__(self, chain=None):
         # type: (Union[Optional[CertificateChain], List[Cert]]) -> None
         self._chain = [] if not chain else list(chain)  # type: List[Cert]
+        self._fingerprints = set() if not chain else { x509_obj.fingerprint for x509_obj in chain }
 
     def __iter__(self):
         # type: () -> Iterator[Cert]
@@ -224,11 +225,16 @@ class CertificateChain:
     def __iadd__(self, x509_obj):
         # type: (Cert) -> CertificateChain
         self._chain.append(x509_obj)
+        self._fingerprints.add(x509_obj.fingerprint)
         return self
 
     def __len__(self):
         # type: () -> int
         return self._chain.__len__()
+
+    def __contains__(self, x509_obj):
+        # type: (Cert) -> bool
+        return self._fingerprints.__contains__(x509_obj.fingerprint)
 
     @property
     def leaf(self):
