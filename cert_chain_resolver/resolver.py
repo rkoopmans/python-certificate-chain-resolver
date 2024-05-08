@@ -42,6 +42,9 @@ def resolve(bytes_cert, _chain=None):
     if not _chain:
         _chain = CertificateChain()
 
+    if cert in _chain:
+        return _chain
+
     _chain += cert
 
     parent_cert = None
