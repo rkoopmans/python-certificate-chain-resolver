@@ -3,17 +3,16 @@
 ## 1.3.0
 
 New feature and sane defaults. for the CLI the root is now by default excluded, at first it would include it if it found one, but not all certificate authorities provide a link to their root in their certs. This resulted in sometimes a root to be included and othertimes not.
+* CLI
+    * Root certificate is excluded by default
+    * Display a warning when root is requested, but not available
+    * New flags
+        * --include-root (for including the root in the output IF AVAILABLE)
+        * --ca-bundle-path (Find the matching root certificate using a custom path)
 
-### cli
-* Root certificate is excluded by default
-* Display a warning when root is requested, but not available
-* New flags
-    * --include-root (for including the root in the output IF AVAILABLE)
-    * --use-store-certifi (Find the matching root certificate using the [certifi](https://github.com/certifi/python-certifi) library)
-
-### API
-* New option for the resolve() api, it can now find the root certificate using the certifi library
-    resolve(cert_pem, use_ca_store=CertifiStore())
+* API
+    * New option for the resolve() api, it can now find the root certificate using a file system bundle
+        resolve(cert_pem, root_ca_store=FileSystemStore('/optional/path/to/bundle.pem'))
 
 ## 1.2.1
 * prevent infinite recursion caused by certificate self-referencing in ca_issuer_access_location (Thanks @trgalho)

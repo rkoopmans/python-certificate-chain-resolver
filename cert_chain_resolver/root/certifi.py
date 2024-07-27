@@ -5,7 +5,7 @@ from cert_chain_resolver.exceptions import (
 from collections import defaultdict
 
 from cert_chain_resolver.models import Cert
-from cert_chain_resolver.root.store import CAStore
+from cert_chain_resolver.root.base_store import CAStore
 from cert_chain_resolver import __is_py3__
 
 try:
@@ -22,6 +22,7 @@ if not __is_py3__:
 
 
 class CertifiStore(CAStore):
+    """ Provider for ROOT certificates from the curated certifi bundle """
     cache = defaultdict(list)  # type: dict[str, list[Cert]]
 
     def find_issuer_candidates(self, cert):

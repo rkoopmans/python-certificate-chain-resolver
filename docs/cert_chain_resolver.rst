@@ -4,18 +4,11 @@ cert\_chain\_resolver package
 Submodules
 ----------
 
-cert\_chain\_resolver.cli module
---------------------------------
 
-.. automodule:: cert_chain_resolver.cli
-   :members:
-   :undoc-members:
-   :show-inheritance:
+cert\_chain\_resolver.resolver module
+-------------------------------------
 
-cert\_chain\_resolver.exceptions module
----------------------------------------
-
-.. automodule:: cert_chain_resolver.exceptions
+.. automodule:: cert_chain_resolver.resolver
    :members:
    :undoc-members:
    :show-inheritance:
@@ -28,14 +21,6 @@ cert\_chain\_resolver.models module
    :undoc-members:
    :show-inheritance:
 
-cert\_chain\_resolver.resolver module
--------------------------------------
-
-.. automodule:: cert_chain_resolver.resolver
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 cert\_chain\_resolver.utils module
 ----------------------------------
 
@@ -44,10 +29,18 @@ cert\_chain\_resolver.utils module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
+cert\_chain\_resolver.cli module
+--------------------------------
 
-.. automodule:: cert_chain_resolver
+.. automodule:: cert_chain_resolver.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cert\_chain\_resolver.exceptions module
+---------------------------------------
+
+.. automodule:: cert_chain_resolver.exceptions
    :members:
    :undoc-members:
    :show-inheritance:

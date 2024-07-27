@@ -11,13 +11,27 @@
 
 Resolve / obtain the certificate intermediates and root of a x509 certificate using the CLI or python API. The CLI provides easy access to a certificate bundle and its metadata while the Python API can be used to inspect, iterate and complete certificate bundles.
 
+
+## Minimal shell
+
+Read more about the shell usage on [read the docs](https://certificate-resolver.readthedocs.io/en/latest/cli_usage.html)
+
+```
+ $ cert_chain_resolver certificate.crt > bundle.crt
+ 1. <Cert common_name="github.com" subject="CN=github.com,O=GitHub\, Inc.,L=San Francisco,ST=California,C=US" issuer="CN=DigiCert SHA2 High Assurance Server CA,OU=www.digicert.com,O=DigiCert Inc,C=US">
+ 2. <Cert common_name="DigiCert SHA2 High Assurance Server CA" subject="CN=DigiCert SHA2 High Assurance Server CA,OU=www.digicert.com,O=DigiCert Inc,C=US" issuer="CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US">
+ 3. <Cert common_name="DigiCert High Assurance EV Root CA" subject="CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US" issuer="CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US">
+```
+
+## Minimal python
+
+Read more regarding the python API on [read the docs](https://certificate-resolver.readthedocs.io/en/latest/api.html)
 ```
 from cert_chain_resolver.api import resolve
-from cert_chain_resolver.root.certifi import CertifiStore
 
 with open('cert.pem', 'rb') as f:
    fb = f.read()
-   chain = resolve(fb, include_root=True, root_ca_store=CertifiStore())
+   chain = resolve(fb)
 >>>
 for cert in chain:
   print(cert)
@@ -26,35 +40,25 @@ for cert in chain:
 <Cert common_name="DST Root CA X3" subject="CN=DST Root CA X3,O=Digital Signature Trust Co." issuer="CN=DST Root CA X3,O=Digital Signature Trust Co.">
 ```
 
+## 
+
 ## Support
 
 * PKCS7, PEM and DER formats
 * LetsEncrypt certificates
-* Resolving the root certificate through a CA Bundle
+* Resolving the root certificate through an auto detected OR chosen CA bundle
 
 ## Dependencies
 
 * cryptography
 
-## Documentation
-
-Read more on [readthedocs](https://certificate-resolver.readthedocs.io/en/latest/)
-
 ## Install
 
 [Pypi](https://pypi.org/project/cert-chain-resolver/)
 
-
-
 Core package
 
     $ pip install cert-chain-resolver
-
-
-With certifi support for finding the matching root certificate
-
-    $ pip install cert-chain-resolver[certifi]
-
 
 ## Usage
 
@@ -66,7 +70,11 @@ Resolve without helpers, just the leaf and intermediates:
 
 Resolve complete chain up to the root:
 
-    $ cert_chain_resolver certificate.crt --include-root --use-store-certifi > bundle.crt
+    $ cert_chain_resolver certificate.crt --include-root > bundle.crt
+
+Resolve complete chain with your own root bundle:
+
+    $ cert_chain_resolver certificate.crt --include-root --ca-bundle-path /path/to/bundle.pem  > bundle.crt
 
 Or read from stdin
 

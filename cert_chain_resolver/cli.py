@@ -3,11 +3,10 @@ import sys
 from typing import Optional
 from cert_chain_resolver.resolver import resolve
 from cert_chain_resolver import __is_py3__
-from cert_chain_resolver.root.store import CAStore
 
 try:
     from typing import Optional
-    from cert_chain_resolver.root.store import CAStore
+    from cert_chain_resolver.root.base_store import CAStore
 except ImportError:
     pass
 
