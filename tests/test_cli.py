@@ -1,4 +1,5 @@
 import pytest
+from cert_chain_resolver import __is_py3__
 
 from cert_chain_resolver.cli import cli
 from .fixtures import BUNDLE_FIXTURES, certfixture_to_id
@@ -11,14 +12,51 @@ except NameError:
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_cert_returns_completed_chain(capsys, bundle):
-    # FIXME: Test with root inclusion!
     cli(file_bytes=bundle[0]["cert_pem"])
 
-    captured = unicode(capsys.readouterr().out)
+    out, err = capsys.readouterr()
+    stdout, stderr = unicode(out), unicode(err)
     expected = "".join(
         [unicode(x["cert_pem"], "ascii") for x in bundle if x["type"] != "root"]
     )
-    assert captured == expected
+    assert stdout == expected
+
+
+@pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
+def test_cert_returns_completed_chain_with_root(capsys, bundle):
+    cli(file_bytes=bundle[0]["cert_pem"], include_root=True)
+
+    out, err = capsys.readouterr()
+    stdout, stderr = unicode(out), unicode(err)
+
+    valid_bundle = []
+    for cert in bundle:
+        valid_bundle.append(cert)
+        if cert["meta"]["ca_issuer_access_location"] is None:
+            break  # stop processing, as we cant continue resolving without a helper!
+
+    expected = "".join([unicode(x["cert_pem"], "ascii") for x in valid_bundle])
+    assert stdout == expected
+
+
+@pytest.mark.skipif(not __is_py3__, reason="Requires Python 3")
+@pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
+def test_cert_returns_completed_chain_with_root_resolved_through_ca_store(
+    capsys, bundle
+):
+    from cert_chain_resolver.root.certifi import CertifiStore
+
+    cli(
+        file_bytes=bundle[0]["cert_pem"],
+        include_root=True,
+        root_ca_store=CertifiStore(),
+    )
+
+    out, err = capsys.readouterr()
+    stdout, stderr = unicode(out), unicode(err)
+
+    expected = "".join([unicode(x["cert_pem"], "ascii") for x in bundle])
+    assert stdout == expected
 
 
 def test_display_flag_is_properly_formatted(capsys):

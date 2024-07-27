@@ -21,14 +21,6 @@ if not __is_py3__:
     raise Python2IncompatibleFeature("Python2 does not support this feature")
 
 
-try:
-    import certifi
-except ImportError:
-    raise CertifiNotInstalled(
-        "Install certify to use this module; install cert-chain-resolver[certifi]"
-    )
-
-
 class CertifiStore(CAStore):
     cache = defaultdict(list)  # type: dict[str, list[Cert]]
 
@@ -41,6 +33,12 @@ class CertifiStore(CAStore):
 
     def _populate_cache(self):
         # type: () -> None
+        try:
+            import certifi
+        except ImportError:
+            raise CertifiNotInstalled(
+                "Install 'certifi' to use this module; install cert-chain-resolver[certifi]"
+            )
         with open(certifi.where(), "rb") as f:
             cert_buffer = bytearray()
             for line in f:

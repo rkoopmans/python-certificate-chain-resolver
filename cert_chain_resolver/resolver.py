@@ -34,7 +34,8 @@ def resolve(bytes_cert, _chain=None, root_ca_store=None):
     Args:
         bytes_cert: A DER/PKCS7/PEM certificate
         _chain: Chain to complete. Defaults to None.
-        use_ca_store: A CAStore to use for resolving the root certificate
+        use_ca_store: A CAStore to use for completing the chain with a root certificate in case
+            the intermediates do not provide a location
 
     Returns:
         All resolved certificates in chain

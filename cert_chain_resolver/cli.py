@@ -1,10 +1,18 @@
 import argparse
 import sys
+from typing import Optional
 from cert_chain_resolver.resolver import resolve
 from cert_chain_resolver import __is_py3__
+from cert_chain_resolver.root.store import CAStore
+
+try:
+    from typing import Optional
+    from cert_chain_resolver.root.store import CAStore
+except ImportError:
+    pass
 
 
-def _print_chain_details(chain):
+def _print_chain_details(chain, include_root):
     for index, cert in enumerate(chain, 1):
         print("== Certificate #{0} ==".format(index))
         print("Subject:".ljust(20) + cert.subject)
@@ -28,18 +36,31 @@ def _print_chain_details(chain):
                 print("    " + domain)
         print("")
 
+    if include_root and not chain.root:
+        sys.stderr.write("WARNING: Root certificate was requested, but not found!\n")
 
-def cli(file_bytes, show_details=False):
-    # type: (bytes, bool) -> None
-    chain = resolve(file_bytes)
+
+def cli(file_bytes, show_details=False, include_root=False, root_ca_store=None):
+    # type: (bytes, bool, bool, Optional[CAStore]) -> None
+    chain = resolve(file_bytes, root_ca_store=root_ca_store)
     if show_details:
-        _print_chain_details(chain)
+        _print_chain_details(chain, include_root=include_root)
     else:
-        for c in [chain.leaf] + list(chain.intermediates):
+        root = [chain.root] if chain.root and include_root else []
+        for c in [chain.leaf] + list(chain.intermediates) + root:
             sys.stdout.write(c.export())
 
-        for i, c in enumerate([chain.leaf] + list(chain.intermediates), 1):
+        for i, c in enumerate([chain.leaf] + list(chain.intermediates) + root, 1):
             sys.stderr.write(str(i) + ". " + repr(c) + "\n")
+
+        if not root and include_root:
+            sys.stderr.write(
+                str(i + 1) + ". Root certificate was requested, but not found!\n"
+            )
+            if not root_ca_store:
+                sys.stderr.write(
+                    "Consider running the CLI with --use-certifi-store to find the matching root CA\n"
+                )
 
 
 def parse_args():
@@ -69,6 +90,14 @@ Examples:
     parser.add_argument(
         "-i", "--info", action="store_true", help="Print chain derived information"
     )
+    parser.add_argument(
+        "--include-root", action="store_true", help="Include root certificate in chain"
+    )
+    parser.add_argument(
+        "--use-store-certifi",
+        action="store_true",
+        help="Use certifi for finding the root certificate",
+    )
     return parser.parse_args()
 
 
@@ -81,7 +110,13 @@ def main():
     cli_args = {
         "file_bytes": None,
         "show_details": args.info,
+        "include_root": args.include_root,
     }
+
+    if args.use_store_certifi:
+        from cert_chain_resolver.root.certifi import CertifiStore
+
+        cli_args["root_ca_store"] = CertifiStore()
 
     if args.file_name == "-":
         source = None
