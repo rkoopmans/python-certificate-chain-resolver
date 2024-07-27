@@ -20,3 +20,7 @@ class CertifiNotInstalled(CertificateChainResolverError):
 
 class RootCertificateNotFound(CertificateChainResolverError):
     pass
+
+
+class Python2IncompatibleFeature(CertificateChainResolverError):
+    pass

@@ -1,9 +1,12 @@
-from cert_chain_resolver.exceptions import CertifiNotInstalled, RootCertificateNotFound
+from cert_chain_resolver.exceptions import (
+    CertifiNotInstalled,
+    Python2IncompatibleFeature,
+)
 from collections import defaultdict
 
 from cert_chain_resolver.models import Cert
 from cert_chain_resolver.root.store import CAStore
-
+from cert_chain_resolver import __is_py3__
 
 try:
     from typing import TYPE_CHECKING
@@ -12,6 +15,10 @@ try:
         from cert_chain_resolver.models import Cert
 except ImportError:
     pass
+
+
+if not __is_py3__:
+    raise Python2IncompatibleFeature("Python2 does not support this feature")
 
 
 try:
