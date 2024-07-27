@@ -14,6 +14,7 @@ except NameError:
 
 try:
     from typing import Any, Optional
+    from cert_chain_resolver.root.store import CAStore
 except ImportError:
     pass
 
@@ -26,13 +27,14 @@ def _download(url):
         return resp.read()
 
 
-def resolve(bytes_cert, _chain=None):
-    # type: (bytes, Optional[CertificateChain]) -> CertificateChain
+def resolve(bytes_cert, _chain=None, root_ca_store=None):
+    # type: (bytes, Optional[CertificateChain], Optional[CAStore]) -> CertificateChain
     """A recursive function that follows the CA issuer chain
 
     Args:
         bytes_cert: A DER/PKCS7/PEM certificate
         _chain: Chain to complete. Defaults to None.
+        use_ca_store: A CAStore to use for resolving the root certificate
 
     Returns:
         All resolved certificates in chain
@@ -43,6 +45,7 @@ def resolve(bytes_cert, _chain=None):
         _chain = CertificateChain()
 
     if cert in _chain:
+        # Prevent recursion in case the cert is self-referential
         return _chain
 
     _chain += cert
@@ -52,6 +55,8 @@ def resolve(bytes_cert, _chain=None):
         parent_cert = _download(cert.ca_issuer_access_location)
 
     if parent_cert:
-        return resolve(parent_cert, _chain=_chain)
+        return resolve(parent_cert, _chain=_chain, root_ca_store=root_ca_store)
+    elif not _chain.root and root_ca_store:
+        _chain += root_ca_store.find_issuer(cert)
 
     return _chain

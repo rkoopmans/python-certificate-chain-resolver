@@ -6,9 +6,11 @@ import pytest
 if not __is_py3__:
     pytest.skip(allow_module_level=True)
 
+
 @pytest.fixture(scope="module")
 def store():
     from cert_chain_resolver.root import certifi
+
     return certifi.CertifiStore()
 
 

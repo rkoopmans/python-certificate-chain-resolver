@@ -25,7 +25,7 @@ try:
     import certifi
 except ImportError:
     raise CertifiNotInstalled(
-        "Install certify to use this module; install cert-chain-resolver[ca-root]"
+        "Install certify to use this module; install cert-chain-resolver[certifi]"
     )
 
 

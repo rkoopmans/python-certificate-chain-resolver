@@ -256,7 +256,9 @@ class CertificateChain:
     def __init__(self, chain=None):
         # type: (Union[Optional[CertificateChain], List[Cert]]) -> None
         self._chain = [] if not chain else list(chain)  # type: List[Cert]
-        self._fingerprints = set() if not chain else { x509_obj.fingerprint for x509_obj in chain }
+        self._fingerprints = (
+            set() if not chain else {x509_obj.fingerprint for x509_obj in chain}
+        )
 
     def __iter__(self):
         # type: () -> Iterator[Cert]
