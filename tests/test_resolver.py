@@ -1,8 +1,7 @@
 from cert_chain_resolver.resolver import resolve
 from cert_chain_resolver.models import Cert
+from cert_chain_resolver.root.base_store import CAStore
 import pytest
-
-from cert_chain_resolver.root.store import CAStore
 
 
 def test_resolve_works_recursively(monkeypatch, mocker):

@@ -42,7 +42,7 @@ Advanced Usage
 ==============
 
 Using the certifi CA Store for resolving root certs
-----------------------------
+---------------------------------------------------
 
 Not all intermediates provide a resolvable path, but we can create the path by matching it with our own CA bundle 
 
@@ -64,7 +64,7 @@ Not all intermediates provide a resolvable path, but we can create the path by m
 Handling Errors
 ===============
 
-It's important to handle exceptions when resolving certificate chains, especially in cases where the input certificate is invalid or the chain cannot be fully resolved:
+The following errors may be thrown
 
 .. code-block:: python
 

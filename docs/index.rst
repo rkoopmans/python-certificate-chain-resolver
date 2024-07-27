@@ -7,7 +7,7 @@ Certificate chain resolver
 ======================================================
 
 
-Resolve / obtain the certificate intermediates of a x509 certificate. 
+The ``cert_chain_resolver`` tool is designed to resolve and obtain the (complete) certificate chain of a given x509 leaf certificate. It supports PEM/DER and PK7CS.. This documentation provides detailed guidance on installing, configuring, and using both the command-line interface and the API.
 
 
 
@@ -19,7 +19,7 @@ Resolve / obtain the certificate intermediates of a x509 certificate.
    cli_usage
    api
    modules
-
+   changelog
 
 
 Indices and tables

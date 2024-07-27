@@ -42,6 +42,8 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
+
+    "myst_parser",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -73,3 +75,8 @@ intersphinx_mapping = {
 
 # autodoc_typehints = 
 autodoc_typehints_format = 'short'
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}

@@ -14,7 +14,7 @@ except NameError:
 
 try:
     from typing import Any, Optional
-    from cert_chain_resolver.root.store import CAStore
+    from cert_chain_resolver.root.base_store import CAStore
 except ImportError:
     pass
 

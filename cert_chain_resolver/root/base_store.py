@@ -12,7 +12,7 @@ except ImportError:
 
 
 class CAStore:
-    """The :class:`CAStore <CAStore>` object, which is a base class for CA Bundles"""
+    """The :class:`CAStore <CAStore>` base class for CA Bundle Providers"""
 
     def find_issuer(self, cert):
         # type: (Cert) -> Cert
