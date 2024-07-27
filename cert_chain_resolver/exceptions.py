@@ -10,10 +10,6 @@ class MissingCertProperty(CertificateChainResolverError):
     pass
 
 
-class CertificateVerificationError(CertificateChainResolverError):
-    pass
-
-
 class CertifiNotInstalled(CertificateChainResolverError):
     pass
 

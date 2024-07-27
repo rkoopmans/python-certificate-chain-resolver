@@ -12,9 +12,7 @@ except ImportError:
 
 
 class CAStore:
-
-    store = "certifi"
-    _impl = None  # type: None | CAStore
+    """The :class:`CAStore <CAStore>` object, which is a base class for CA Bundles"""
 
     def find_issuer(self, cert):
         # type: (Cert) -> Cert
@@ -34,14 +32,3 @@ class CAStore:
     def find_issuer_candidates(self, cert):
         # type: (Cert) -> list[Cert]
         raise NotImplementedError
-
-    @property
-    def impl(self):
-        # type: () -> CAStore
-        if self._impl:
-            return self._impl
-
-        from cert_chain_resolver.root.certifi import CertifiStore
-
-        self._impl = CertifiStore()
-        return self._impl

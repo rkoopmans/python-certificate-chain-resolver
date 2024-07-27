@@ -9,17 +9,15 @@
 [![PyPI](https://img.shields.io/pypi/v/cert-chain-resolver)](https://pypi.org/project/cert-chain-resolver/#history)
 
 
-
-Resolve / obtain the certificate intermediates of a x509 certificate using the CLI or python API.
-
-
-The CLI writes the full bundle to stdout. The Python API can be used to iterate over the certificates and get additional information on the bundle.
+Resolve / obtain the certificate intermediates and root of a x509 certificate using the CLI or python API. The CLI provides easy access to a certificate bundle and its metadata while the Python API can be used to inspect, iterate and complete certificate bundles.
 
 ```
 from cert_chain_resolver.api import resolve
+from cert_chain_resolver.root.certifi import CertifiStore
+
 with open('cert.pem', 'rb') as f:
    fb = f.read()
-   chain = resolve(fb)
+   chain = resolve(fb, include_root=True, root_ca_store=CertifiStore())
 >>>
 for cert in chain:
   print(cert)
@@ -32,6 +30,7 @@ for cert in chain:
 
 * PKCS7, PEM and DER formats
 * LetsEncrypt certificates
+* Resolving the root certificate through a CA Bundle
 
 ## Dependencies
 
@@ -46,14 +45,28 @@ Read more on [readthedocs](https://certificate-resolver.readthedocs.io/en/latest
 [Pypi](https://pypi.org/project/cert-chain-resolver/)
 
 
+
+Core package
+
     $ pip install cert-chain-resolver
+
+
+With certifi support for finding the matching root certificate
+
+    $ pip install cert-chain-resolver[certifi]
 
 
 ## Usage
 
 ### Installed using PIP
 
+Resolve without helpers, just the leaf and intermediates:
+
     $ cert_chain_resolver certificate.crt > bundle.crt
+
+Resolve complete chain up to the root:
+
+    $ cert_chain_resolver certificate.crt --include-root --use-store-certifi > bundle.crt
 
 Or read from stdin
 

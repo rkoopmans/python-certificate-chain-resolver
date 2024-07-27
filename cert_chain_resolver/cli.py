@@ -91,12 +91,14 @@ Examples:
         "-i", "--info", action="store_true", help="Print chain derived information"
     )
     parser.add_argument(
-        "--include-root", action="store_true", help="Include root certificate in chain"
+        "--include-root",
+        action="store_true",
+        help="Include root certificate in the chain if available",
     )
     parser.add_argument(
         "--use-store-certifi",
         action="store_true",
-        help="Use certifi for finding the root certificate",
+        help="Utilize the Certifi package's CA bundle as the root certificate store for completing the chain",
     )
     return parser.parse_args()
 

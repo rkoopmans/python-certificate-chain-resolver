@@ -1,7 +1,4 @@
-from cert_chain_resolver.exceptions import (
-    CertificateVerificationError,
-    MissingCertProperty,
-)
+from cert_chain_resolver.exceptions import MissingCertProperty
 from cert_chain_resolver.utils import load_ascii_to_x509, load_bytes_to_x509
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
