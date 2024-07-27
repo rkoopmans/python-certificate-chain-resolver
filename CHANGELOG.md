@@ -1,5 +1,8 @@
 # Changelog 
 
+## 1.2.1
+* prevent infinite recursion caused by certificate self-referencing in ca_issuer_access_location (Thanks @trgalho)
+
 ## 1.2.0a1
 * Added mypy type hints
 * Introducing a new Exception (MissingCertProperty) when a property is requested and can't be found
