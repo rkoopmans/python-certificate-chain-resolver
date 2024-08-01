@@ -2,6 +2,7 @@ import pytest
 from cert_chain_resolver import __is_py3__
 
 from cert_chain_resolver.cli import cli
+from cert_chain_resolver.castore.file_system import FileSystemStore
 from .fixtures import BUNDLE_FIXTURES, certfixture_to_id
 
 try:
@@ -44,12 +45,10 @@ def test_cert_returns_completed_chain_with_root(capsys, bundle):
 def test_cert_returns_completed_chain_with_root_resolved_through_ca_store(
     capsys, bundle
 ):
-    from cert_chain_resolver.root.certifi import CertifiStore
-
     cli(
         file_bytes=bundle[0]["cert_pem"],
         include_root=True,
-        root_ca_store=CertifiStore(),
+        root_ca_store=FileSystemStore(),
     )
 
     out, err = capsys.readouterr()

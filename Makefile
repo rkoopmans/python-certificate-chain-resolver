@@ -1,7 +1,7 @@
 ENV_DIR = ./env
 PIP := $(ENV_DIR)/bin/pip
 
-.PHONY: all tests coverage clean pyclean docs
+.PHONY: all tests coverage clean pyclean docs format
 
 all: tests
 
@@ -35,3 +35,6 @@ pyclean:
 
 clean: pyclean
 	rm -rf .reqs_dev .reqs $(ENV_DIR) .tox
+
+format: .reqs_dev .reqs
+	$(ENV_DIR)/bin/black tests cert_chain_resolver
