@@ -29,19 +29,6 @@ cert\_chain\_resolver.utils module
    :undoc-members:
    :show-inheritance:
 
-cert\_chain\_resolver.root module
-----------------------------------
-
-.. automodule:: cert_chain_resolver.root.base_store
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-.. automodule:: cert_chain_resolver.root.certifi
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 cert\_chain\_resolver.cli module
 --------------------------------
 

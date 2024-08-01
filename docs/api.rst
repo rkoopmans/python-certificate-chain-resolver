@@ -41,21 +41,28 @@ This will print each certificate in the chain, starting with the leaf and ending
 Advanced Usage
 ==============
 
-Using the certifi CA Store for resolving root certs
+Using the System CA Store or own bundle for resolving root certs
 ---------------------------------------------------
 
-Not all intermediates provide a resolvable path, but we can create the path by matching it with our own CA bundle 
+Not all CA intermediates provide a web traversable path to the root certificate. Therefore we need to find the root ourselves if we want to have the complete chain of trust.
 
 .. code-block:: python
 
-   from cert_chain_resolver.api import resolve
-   from cert_chain_resolver.root.certifi import CertifiStore
+   from cert_chain_resolver.api import resolve, FileSystemStore
 
    # Load your certificate
    with open('cert.pem', 'rb') as f:
        file_bytes = f.read()
 
+   # Will try to find the root bundle on your systemm will raise if it cannot be found
    chain = resolve(file_bytes, root_ca_store=CertifiStore())
+
+   # We override the path to the root certificate bundle
+   chain = resolve(file_bytes, root_ca_store=CertifiStore('/etc/cabundles/mine.pem'))
+   
+   # We leverage certifi for the root bundle
+   import certifi
+   chain = resolve(file_bytes, root_ca_store=CertifiStore(certifi.where()))
 
    for cert in chain:
        print(cert)
