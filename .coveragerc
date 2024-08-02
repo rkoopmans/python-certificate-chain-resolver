@@ -1,0 +1,8 @@
+[run]
+relative_files = True
+source = cert_chain_resolver
+
+[paths]
+source =
+    cert_chain_resolver
+    */cert_chain_resolver

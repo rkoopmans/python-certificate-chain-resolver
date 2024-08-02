@@ -3,6 +3,7 @@
 [![Licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://tldrlegal.com/license/mit-license)
 [![CI](https://github.com/rkoopmans/python-certificate-chain-resolver/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/rkoopmans/python-certificate-chain-resolver/actions/workflows/ci-cd.yml)
 [![Docs](https://readthedocs.org/projects/certificate-resolver/badge/?version=latest)](https://certificate-resolver.readthedocs.io/en/latest/)
+[![codecov](https://codecov.io/github/rkoopmans/python-certificate-chain-resolver/graph/badge.svg?token=P2K55Z1KME)](https://codecov.io/github/rkoopmans/python-certificate-chain-resolver)
 [![Downloads](https://static.pepy.tech/badge/cert-chain-resolver/week)](https://pepy.tech/project/cert-chain-resolver)
 [![Python)](https://img.shields.io/pypi/pyversions/cert-chain-resolver.svg)](https://pypi.org/project/cert-chain-resolver/)
 [![PyPI - Wheel](https://img.shields.io/pypi/wheel/cert-chain-resolver)](https://pypi.org/project/cert-chain-resolver/)
