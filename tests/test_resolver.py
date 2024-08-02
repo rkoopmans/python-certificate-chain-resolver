@@ -1,6 +1,6 @@
 from cert_chain_resolver.resolver import resolve
 from cert_chain_resolver.models import Cert
-from cert_chain_resolver.root.base_store import CAStore
+from cert_chain_resolver.castore.base_store import CAStore
 import pytest
 
 

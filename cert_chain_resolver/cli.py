@@ -1,12 +1,14 @@
 import argparse
+import ssl
 import sys
 from typing import Optional
 from cert_chain_resolver.resolver import resolve
 from cert_chain_resolver import __is_py3__
+from cert_chain_resolver.castore.file_system import FileSystemStore
 
 try:
     from typing import Optional
-    from cert_chain_resolver.root.base_store import CAStore
+    from cert_chain_resolver.castore.base_store import CAStore
 except ImportError:
     pass
 
@@ -95,9 +97,10 @@ Examples:
         help="Include root certificate in the chain if available",
     )
     parser.add_argument(
-        "--use-store-certifi",
-        action="store_true",
-        help="Utilize the Certifi package's CA bundle as the root certificate store for completing the chain",
+        "--ca-bundle-path",
+        type=str,
+        default=None,
+        help="Use a custom CA bundle for completing the chain",
     )
     return parser.parse_args()
 
@@ -114,10 +117,7 @@ def main():
         "include_root": args.include_root,
     }
 
-    if args.use_store_certifi:
-        from cert_chain_resolver.root.certifi import CertifiStore
-
-        cli_args["root_ca_store"] = CertifiStore()
+    cli_args["root_ca_store"] = FileSystemStore(args.ca_bundle_path)
 
     if args.file_name == "-":
         source = None

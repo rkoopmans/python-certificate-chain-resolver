@@ -14,7 +14,7 @@ except NameError:
 
 try:
     from typing import Any, Optional
-    from cert_chain_resolver.root.base_store import CAStore
+    from cert_chain_resolver.castore.base_store import CAStore
 except ImportError:
     pass
 
@@ -34,7 +34,7 @@ def resolve(bytes_cert, _chain=None, root_ca_store=None):
     Args:
         bytes_cert: A DER/PKCS7/PEM certificate
         _chain: Chain to complete. Defaults to None.
-        use_ca_store: A CAStore to use for completing the chain with a root certificate in case
+        root_ca_store: A CAStore to use for completing the chain with a root certificate in case
             the intermediates do not provide a location
 
     Returns:
