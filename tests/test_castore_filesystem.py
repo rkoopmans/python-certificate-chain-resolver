@@ -9,9 +9,6 @@ from tests.fixtures import BUNDLE_FIXTURES, certfixture_to_id
 import tempfile
 import pytest
 
-if not __is_py3__:
-    pytest.skip(allow_module_level=True)
-
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_find_root(bundle):

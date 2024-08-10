@@ -40,7 +40,6 @@ def test_cert_returns_completed_chain_with_root(capsys, bundle):
     assert stdout == expected
 
 
-@pytest.mark.skipif(not __is_py3__, reason="Requires Python 3")
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
 def test_cert_returns_completed_chain_with_root_resolved_through_ca_store(
     capsys, bundle
