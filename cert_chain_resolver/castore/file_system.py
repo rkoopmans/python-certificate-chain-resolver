@@ -13,9 +13,9 @@ from cert_chain_resolver import __is_py3__
 try:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from cert_chain_resolver.models import Cert
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 

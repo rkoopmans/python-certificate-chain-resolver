@@ -1,7 +1,10 @@
+import importlib
+import sys
+from tempfile import NamedTemporaryFile
 import pytest
 from cert_chain_resolver import __is_py3__
 
-from cert_chain_resolver.cli import cli
+from cert_chain_resolver.cli import cli, main, parse_args
 from cert_chain_resolver.castore.file_system import FileSystemStore
 from .fixtures import BUNDLE_FIXTURES, certfixture_to_id
 
@@ -9,6 +12,82 @@ try:
     unicode  # type: ignore
 except NameError:
     unicode = str
+
+
+@pytest.mark.parametrize(
+    "cli_args, expected",
+    [
+        (
+            [],
+            {
+                "file_name": "-",
+                "info": False,
+                "include_root": False,
+                "ca_bundle_path": None,
+            },
+        ),
+        (
+            ["test.crt"],
+            {
+                "file_name": "test.crt",
+                "info": False,
+                "include_root": False,
+                "ca_bundle_path": None,
+            },
+        ),
+        (
+            ["-i"],
+            {
+                "file_name": "-",
+                "info": True,
+                "include_root": False,
+                "ca_bundle_path": None,
+            },
+        ),
+        (
+            ["--include-root"],
+            {
+                "file_name": "-",
+                "info": False,
+                "include_root": True,
+                "ca_bundle_path": None,
+            },
+        ),
+        (
+            ["--ca-bundle-path", "/path/to/ca/bundle"],
+            {
+                "file_name": "-",
+                "info": False,
+                "include_root": False,
+                "ca_bundle_path": "/path/to/ca/bundle",
+            },
+        ),
+        (
+            [
+                "test.crt",
+                "-i",
+                "--include-root",
+                "--ca-bundle-path",
+                "/path/to/ca/bundle",
+            ],
+            {
+                "file_name": "test.crt",
+                "info": True,
+                "include_root": True,
+                "ca_bundle_path": "/path/to/ca/bundle",
+            },
+        ),
+    ],
+)
+def test_parse_args(cli_args, expected, monkeypatch):
+    monkeypatch.setattr("sys.argv", ["script_name"] + cli_args)
+
+    args = parse_args()
+
+    assert args.file_name == expected["file_name"]
+    assert args.info == expected["info"]
+    assert args.include_root == expected["include_root"]
+    assert args.ca_bundle_path == expected["ca_bundle_path"]
 
 
 @pytest.mark.parametrize("bundle", BUNDLE_FIXTURES, ids=certfixture_to_id)
@@ -97,3 +176,60 @@ Domains:
     )
 
     assert expected == captured
+
+
+def test_display_flag_includes_warning_when_root_was_requested_but_not_found(capsys):
+    bundle = BUNDLE_FIXTURES[0]
+    cli(file_bytes=bundle[0]["cert_pem"], show_details=True, include_root=True)
+    captured = unicode(capsys.readouterr().err)
+    assert captured == "WARNING: Root certificate was requested, but not found!\n"
+
+
+@pytest.mark.parametrize(
+    "file_name, expected_content",
+    [("test.pem", b"test certificate data"), ("-", b"stdin data")],
+)
+def test_main_handles_different_file_input(mocker, file_name, expected_content):
+    args = mocker.Mock(
+        info=True, include_root=False, ca_bundle_path="/test/path", file_name="test.pem"
+    )
+    args.file_name = file_name
+    mocker.patch("cert_chain_resolver.cli.parse_args", return_value=args)
+
+    fs_store = mocker.patch("cert_chain_resolver.cli.FileSystemStore")
+
+    if file_name == "-":
+        if __is_py3__:
+            mocker.patch("sys.stdin.buffer.read", return_value=expected_content)
+        else:
+            mocker.patch("sys.stdin.read", return_value=expected_content)
+    else:
+        if __is_py3__:
+            mocker.patch("builtins.open", mocker.mock_open(read_data=expected_content))
+        else:
+            mocker.patch(
+                "__builtin__.open", mocker.mock_open(read_data=expected_content)
+            )
+
+    mock_cli = mocker.patch("cert_chain_resolver.cli.cli")
+
+    main()
+
+    assert fs_store.call_args == mocker.call(
+        "/test/path",
+    )
+    assert mock_cli.call_args == mocker.call(
+        file_bytes=expected_content,
+        show_details=True,
+        include_root=False,
+        root_ca_store=mocker.ANY,
+    )
+
+
+def test_main_no_args_tty_shows_help_and_exits(mocker):
+    mocker.patch("sys.stdin.isatty", return_value=True)
+    mocker.patch("sys.argv", ["script_name"])
+
+    with pytest.raises(SystemExit):
+        main()
+    assert sys.argv == ["script_name", "-h"]

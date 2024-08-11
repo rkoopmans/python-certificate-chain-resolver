@@ -1,5 +1,9 @@
 # Changelog 
 
+## 1.3.1
+
+* is_issued_by now raises MissingCertProperty if no hash algorithm found. Before it would silently return False
+
 ## 1.3.0
 
 New feature and sane defaults. for the CLI the root is now by default excluded, at first it would include it if it found one, but not all certificate authorities provide a link to their root in their certs. This resulted in sometimes a root to be included and othertimes not.

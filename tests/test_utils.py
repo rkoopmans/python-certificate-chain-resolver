@@ -1,4 +1,6 @@
 import pytest
+
+from cert_chain_resolver.exceptions import ImproperlyFormattedCert
 from .fixtures import TEST_CERTS_IN_VARIOUS_FORMATS
 from cert_chain_resolver.utils import load_bytes_to_x509
 from cryptography.x509 import Certificate
@@ -10,3 +12,8 @@ def test_load_bytes_to_x509(file_type, source_file):
         content = f.read()
         res = load_bytes_to_x509(content)
         assert isinstance(res, Certificate)
+
+
+def test_load_other_text_raises():
+    with pytest.raises(ImproperlyFormattedCert):
+        load_bytes_to_x509(b"just text")

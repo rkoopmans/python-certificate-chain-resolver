@@ -9,7 +9,7 @@ from cert_chain_resolver.castore.file_system import FileSystemStore
 try:
     from typing import Optional
     from cert_chain_resolver.castore.base_store import CAStore
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 
@@ -133,5 +133,5 @@ def main():
     cli(**cli_args)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()

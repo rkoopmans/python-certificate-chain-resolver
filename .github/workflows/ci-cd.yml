@@ -21,7 +21,7 @@ jobs:
         python -m pip install -r requirements_dev.txt
     - name: Test with pytest and coverage
       run: |
-        pytest --cov=./cert_chain_resolver --cov-report term-missing -n auto
+        pytest --rootdir=. --cov=./cert_chain_resolver --cov-report term-missing -n auto tests/
     - name: Upload coverage artifact
       if: success()
       uses: actions/upload-artifact@v4
@@ -46,7 +46,7 @@ jobs:
         python -m pip install -r requirements_dev.txt
     - name: Test with pytest and coverage
       run: |
-        pytest --cov=./cert_chain_resolver --cov-report term-missing -n auto
+        pytest --rootdir=. --cov=./cert_chain_resolver --cov-report term-missing -n auto tests/
     - name: Upload coverage artifact
       if: success()
       uses: actions/upload-artifact@v4
@@ -74,17 +74,16 @@ jobs:
         pattern: coverage-*
     - name: Combine coverage reports
       run: |
-        ls -lashR .
         set -x
         coverage combine coverage-*/.coverage
         coverage report
-        coverage xml -o combined_coverage.xml
+        coverage xml -o ./coverage.xml
 
         coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
-        file: ./combined_coverage.xml
+        file: ./coverage.xml
         token: ${{ secrets.CODECOV_TOKEN }}
   mypy:
     runs-on: ubuntu-latest

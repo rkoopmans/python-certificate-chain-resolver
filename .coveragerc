@@ -6,3 +6,6 @@ source = cert_chain_resolver
 source =
     cert_chain_resolver
     */cert_chain_resolver
+
+[report]
+include = cert_chain_resolver/*

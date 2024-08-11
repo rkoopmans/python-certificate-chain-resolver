@@ -15,7 +15,7 @@ except NameError:
 try:
     from typing import Any, Optional
     from cert_chain_resolver.castore.base_store import CAStore
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 

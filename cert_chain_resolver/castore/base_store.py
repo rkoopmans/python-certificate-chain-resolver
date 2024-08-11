@@ -5,9 +5,10 @@ from cert_chain_resolver.models import Cert
 try:
     from typing import TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         from cert_chain_resolver.models import Cert
-except ImportError:
+except ImportError:  # pragma: no cover
+
     pass
 
 

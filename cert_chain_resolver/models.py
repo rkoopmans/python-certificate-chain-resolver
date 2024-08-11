@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.serialization import Encoding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from cryptography.hazmat.primitives.asymmetric.ec import ECDSA, EllipticCurvePublicKey
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
+from cryptography.exceptions import InvalidSignature
 
 
 import binascii
@@ -15,9 +16,9 @@ import binascii
 try:
     from typing import List, Union, Optional, Type, Iterator, TYPE_CHECKING
 
-    if TYPE_CHECKING:
+    if TYPE_CHECKING:  # pragma: no cover
         import datetime
-except ImportError:
+except ImportError:  # pragma: no cover
     pass
 
 try:
@@ -44,13 +45,8 @@ class Cert:
 
     def __repr__(self):
         # type: () -> str
-        try:
-            common_name = self.common_name
-        except MissingCertProperty:
-            common_name = None
-
         return '<Cert common_name="{0}" subject="{1}" issuer="{2}">'.format(
-            common_name, self.subject, self.issuer
+            self.common_name, self.subject, self.issuer
         )
 
     def __eq__(self, other):
@@ -209,7 +205,7 @@ class Cert:
                     ECDSA(hash_algorithm),
                 )
                 return True
-        except Exception:
+        except InvalidSignature as e:
             pass
 
         return False
