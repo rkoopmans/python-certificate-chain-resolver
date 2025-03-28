@@ -135,14 +135,20 @@ class Cert:
     @property
     def not_valid_before(self):
         # type: () -> datetime.datetime
-        """Date from the underlying :py:class:`cryptography.x509.Certificate` object"""
-        return self._x509.not_valid_before
+        """Date from the underlying :py:class:`cryptography.x509.Certificate` object. returns the UTC version if cryptography version is 42.0 or higher"""
+        if hasattr(self._x509, 'not_valid_before_utc'):
+            return self._x509.not_valid_before_utc
+        else:
+            return self._x509.not_valid_before
 
     @property
     def not_valid_after(self):
         # type: () -> datetime.datetime
-        """Date from the underlying :py:class:`cryptography.x509.Certificate` object"""
-        return self._x509.not_valid_after
+        """Date from the underlying :py:class:`cryptography.x509.Certificate` object. returns the UTC version if cryptography version is 42.0 or higher"""
+        if hasattr(self._x509, 'not_valid_after_utc'):
+            return self._x509.not_valid_after_utc
+        else:
+            return self._x509.not_valid_after
 
     @property
     def fingerprint(self):
