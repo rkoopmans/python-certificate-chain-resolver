@@ -1,5 +1,11 @@
 # Changelog 
 
+## 1.4.0
+
+* Extended support to python 3.13
+* Cert.not_valid_before returns UTC datetime if cryptography version  >= 42
+* Cert.not_valid_after returns UTC datetime if cryptography version  >= 42
+
 ## 1.3.1
 
 * is_issued_by now raises MissingCertProperty if no hash algorithm found. Before it would silently return False
