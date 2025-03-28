@@ -9,6 +9,8 @@ from cryptography.hazmat.primitives.asymmetric.ec import ECDSA, EllipticCurvePub
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.exceptions import InvalidSignature
+from ._utils import make_utc_aware_if_cryptography_above_42
+
 
 
 try:
@@ -51,8 +53,8 @@ def test_certcontainer_x509_helper_props(cert):
     assert fixture["ca"] == c.is_ca
     assert fixture["serial"] == c.serial
     assert fixture["signature_algorithm"] == c.signature_hash_algorithm
-    assert fixture["not_before"] == c.not_valid_before
-    assert fixture["not_after"] == c.not_valid_after
+    assert make_utc_aware_if_cryptography_above_42(fixture["not_before"]) == c.not_valid_before
+    assert make_utc_aware_if_cryptography_above_42(fixture["not_after"]) == c.not_valid_after
     assert fixture["fingerprint_sha256"] == c.fingerprint
     assert fixture["ca_issuer_access_location"] == c.ca_issuer_access_location
 
