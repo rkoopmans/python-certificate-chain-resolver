@@ -22,12 +22,13 @@ jobs:
     - name: Test with pytest and coverage
       run: |
         pytest --rootdir=. --cov=./cert_chain_resolver --cov-report term-missing -n auto tests/
+        mv .coverage coverage-db
     - name: Upload coverage artifact
       if: success()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-2.7
-        path: .coverage
+        path: coverage-db
 
   Test:
     runs-on: ubuntu-latest
@@ -47,12 +48,13 @@ jobs:
     - name: Test with pytest and coverage
       run: |
         pytest --rootdir=. --cov=./cert_chain_resolver --cov-report term-missing -n auto tests/
+        mv .coverage coverage-db
     - name: Upload coverage artifact
       if: success()
       uses: actions/upload-artifact@v4
       with:
         name: coverage-${{ matrix.python-version }}
-        path: .coverage
+        path: coverage-db
 
   combine-coverage:
     runs-on: ubuntu-latest
@@ -75,7 +77,7 @@ jobs:
     - name: Combine coverage reports
       run: |
         set -x
-        coverage combine coverage-*/.coverage
+        coverage combine coverage-*/coverage-db
         coverage report
         coverage xml -o ./coverage.xml
 
