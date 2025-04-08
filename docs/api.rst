@@ -24,7 +24,8 @@ To resolve the full certificate chain for a certificate in PEM format:
 
    # Output certificates
    for cert in chain:
-       print(cert)
+       print(cert) # Print the certificate object
+       print(cert.export())  # Export the certificate in PEM format
 
 
 Expected output:
@@ -32,8 +33,11 @@ Expected output:
 .. code-block:: none
 
    <Cert common_name="cert-chain-resolver.remcokoopmans.com" subject="CN=cert-chain-resolver.remcokoopmans.com" issuer="CN=R3,O=Let's Encrypt,C=US">
+   "-----BEGIN CERTIFICATE-----...."
    <Cert common_name="R3" subject="CN=R3,O=Let's Encrypt,C=US" issuer="CN=DST Root CA X3,O=Digital Signature Trust Co.">
+   "-----BEGIN CERTIFICATE-----...."
    <Cert common_name="DST Root CA X3" subject="CN=DST Root CA X3,O=Digital Signature Trust Co." issuer="CN=DST Root CA X3,O=Digital Signature Trust Co.">
+   "-----BEGIN CERTIFICATE-----...."
 
 This will print each certificate in the chain, starting with the leaf and ending with the root, if available.
 
