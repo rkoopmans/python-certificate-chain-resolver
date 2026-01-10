@@ -10,7 +10,7 @@ on:
 
 jobs:
   Test-python-27:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container:
       image: python:2.7.18-buster
     steps:
@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
