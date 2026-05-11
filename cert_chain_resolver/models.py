@@ -2,7 +2,7 @@ from cert_chain_resolver.exceptions import MissingCertProperty
 from cert_chain_resolver.utils import load_ascii_to_x509, load_bytes_to_x509
 from cryptography import x509
 from cryptography.x509.oid import ExtensionOID, AuthorityInformationAccessOID, NameOID
-from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.serialization import Encoding
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPublicKey
 from cryptography.hazmat.primitives.asymmetric.ec import ECDSA, EllipticCurvePublicKey
@@ -11,7 +11,6 @@ from cryptography.exceptions import InvalidSignature
 
 
 import binascii
-
 
 try:
     from typing import List, Union, Optional, Type, Iterator, TYPE_CHECKING
@@ -136,7 +135,7 @@ class Cert:
     def not_valid_before(self):
         # type: () -> datetime.datetime
         """Date from the underlying :py:class:`cryptography.x509.Certificate` object. returns the UTC version if cryptography version is 42.0 or higher"""
-        if hasattr(self._x509, 'not_valid_before_utc'):
+        if hasattr(self._x509, "not_valid_before_utc"):
             return self._x509.not_valid_before_utc
         else:
             return self._x509.not_valid_before
@@ -145,7 +144,7 @@ class Cert:
     def not_valid_after(self):
         # type: () -> datetime.datetime
         """Date from the underlying :py:class:`cryptography.x509.Certificate` object. returns the UTC version if cryptography version is 42.0 or higher"""
-        if hasattr(self._x509, 'not_valid_after_utc'):
+        if hasattr(self._x509, "not_valid_after_utc"):
             return self._x509.not_valid_after_utc
         else:
             return self._x509.not_valid_after
@@ -155,6 +154,22 @@ class Cert:
         # type: () -> str
         """ascii encoded sha256 fingerprint by calling :py:func:`get_fingerprint`"""
         return self.get_fingerprint(hashes.SHA256)
+
+    @property
+    def public_key_fingerprint(self):
+        # type: () -> str
+        """SHA-256 hex digest of the certificate's SubjectPublicKeyInfo.
+
+        Two certificates with the same Subject and same ``public_key_fingerprint``
+        represent the same identity - this is how cross-signed variants of a CA
+        certificate are detected, since they share both fields but differ in Issuer.
+        """
+        spki = self._x509.public_key().public_bytes(
+            Encoding.DER, serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+        digest = hashes.Hash(hashes.SHA256())
+        digest.update(spki)
+        return binascii.hexlify(digest.finalize()).decode("ascii")
 
     @property
     def ca_issuer_access_location(self):
@@ -187,6 +202,21 @@ class Cert:
         binary = self._x509.fingerprint(_hash())
         txt = binascii.hexlify(binary).decode("ascii")
         return txt
+
+    def is_cross_sign_of(self, other):
+        # type: (Cert) -> bool
+        """Whether this certificate is a cross-signed variant of ``other``.
+
+        Two certificates are cross-signs of each other when they share Subject and
+        Subject Public Key Info but were issued by different CAs - i.e. they represent
+        the same identity but provide alternative paths to different trust anchors.
+        A certificate is never its own cross-sign.
+        """
+        return (
+            self != other
+            and self.subject == other.subject
+            and self.public_key_fingerprint == other.public_key_fingerprint
+        )
 
     def is_issued_by(self, other):
         # type: (Cert) -> bool
@@ -258,6 +288,8 @@ class CertificateChain:
         self._fingerprints = (
             set() if not chain else {x509_obj.fingerprint for x509_obj in chain}
         )
+        self._cross_signs = []  # type: List[Cert]
+        self._cross_sign_fingerprints = set()  # type: set
 
     def __iter__(self):
         # type: () -> Iterator[Cert]
@@ -298,6 +330,26 @@ class CertificateChain:
         if self._chain[-1].is_root:
             return self._chain[-1]
         return None
+
+    @property
+    def cross_signs(self):
+        # type: () -> List[Cert]
+        """Cross-signed variants discovered alongside the chain.
+
+        A cross-sign is a certificate that shares Subject and public key with a cert
+        already in the chain but is issued by a different CA. Modern clients ignore
+        them; older clients can use them to build a path to a different trust anchor.
+        Returns a shallow copy.
+        """
+        return list(self._cross_signs)
+
+    def add_cross_sign(self, cert):
+        # type: (Cert) -> None
+        """Add a cross-signed variant to the chain, deduplicating by fingerprint."""
+        if cert.fingerprint in self._cross_sign_fingerprints:
+            return
+        self._cross_signs.append(cert)
+        self._cross_sign_fingerprints.add(cert.fingerprint)
 
     @classmethod
     def load_from_pem(cls, input_bytes):

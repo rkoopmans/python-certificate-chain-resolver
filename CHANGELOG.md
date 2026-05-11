@@ -1,5 +1,12 @@
 # Changelog 
 
+## Unreleased
+
+* New: discover cross-signed root variants from the issuing CA's AIA bundle and expose them on the chain.
+    * CLI: new `--include-cross-signs` flag appends discovered cross-signs to the bundle output. Cross-signs are also surfaced in `--info` regardless of the flag.
+    * API: `CertificateChain.cross_signs` lists the discovered variants; `Cert.public_key_fingerprint` exposes the SubjectPublicKeyInfo hash used for matching.
+    * Utils: new `load_ascii_to_x509_all`, `load_der_to_x509_all`, `load_bytes_to_x509_all` return every certificate from a PKCS7 bundle (existing `load_*_to_x509` keeps returning the first cert).
+
 ## 1.4.0
 
 * Extended support to python 3.13

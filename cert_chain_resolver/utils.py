@@ -3,7 +3,7 @@ from cryptography.hazmat.primitives.serialization import pkcs7
 from cert_chain_resolver.exceptions import ImproperlyFormattedCert
 
 try:
-    from typing import TYPE_CHECKING
+    from typing import List, TYPE_CHECKING
 
     if TYPE_CHECKING:  # pragma: no cover
         from cert_chain_resolver.models import Cert
@@ -14,28 +14,65 @@ except ImportError:  # pragma: no cover
 
 def load_ascii_to_x509(bytes_input):
     # type: (bytes) -> x509.Certificate
-    """Converts ASCII PKCS7 or Certificate to a :py:class:`cryptography.x509.Certificate` object"""
-    first_line = bytes_input.decode("ascii").splitlines()[0]
-    if first_line == "-----BEGIN PKCS7-----":
-        return pkcs7.load_pem_pkcs7_certificates(bytes_input)[0]
-    elif first_line == "-----BEGIN CERTIFICATE-----":
-        return x509.load_pem_x509_certificate(bytes_input)
-    raise ImproperlyFormattedCert("Cert can not be read! It is not a valid PEM")
+    """Converts ASCII PKCS7 or Certificate to a :py:class:`cryptography.x509.Certificate` object.
+
+    Kept for backwards compatibility; returns only the first certificate when the
+    input contains multiple (e.g. a PKCS7 bundle with cross-signs). Prefer
+    :py:func:`load_ascii_to_x509_all` when you need every cert in the input.
+    """
+    return load_ascii_to_x509_all(bytes_input)[0]
 
 
 def load_der_to_x509(bytes_input):
     # type: (bytes) -> x509.Certificate
-    """Converts bytes formatted DER (PKCS7 or Cert) to :py:class:`cryptography.x509.Certificate` object"""
-    try:
-        return x509.load_der_x509_certificate(bytes_input)
-    except ValueError:
-        return pkcs7.load_der_pkcs7_certificates(bytes_input)[0]
+    """Converts bytes formatted DER (PKCS7 or Cert) to :py:class:`cryptography.x509.Certificate` object.
+
+    Kept for backwards compatibility; returns only the first certificate when the
+    input contains multiple. Prefer :py:func:`load_der_to_x509_all` when you need
+    every cert in the input.
+    """
+    return load_der_to_x509_all(bytes_input)[0]
 
 
 def load_bytes_to_x509(bytes_input):
     # type: (bytes) -> x509.Certificate
-    """Converts Certificate / PKCS7 in ASCII or DER to :py:class:`cryptography.x509.Certificate` object"""
+    """Converts Certificate / PKCS7 in ASCII or DER to :py:class:`cryptography.x509.Certificate` object.
+
+    Kept for backwards compatibility; returns only the first certificate when the
+    input contains multiple. Prefer :py:func:`load_bytes_to_x509_all` when you need
+    every cert in the input.
+    """
+    return load_bytes_to_x509_all(bytes_input)[0]
+
+
+def load_ascii_to_x509_all(bytes_input):
+    # type: (bytes) -> List[x509.Certificate]
+    """Converts ASCII PKCS7 or Certificate to a list of :py:class:`cryptography.x509.Certificate` objects.
+
+    A PKCS7 bundle may contain multiple certificates (e.g. a root and its cross-signed
+    variants); a plain PEM input yields a single-element list.
+    """
+    first_line = bytes_input.decode("ascii").splitlines()[0]
+    if first_line == "-----BEGIN PKCS7-----":
+        return list(pkcs7.load_pem_pkcs7_certificates(bytes_input))
+    elif first_line == "-----BEGIN CERTIFICATE-----":
+        return [x509.load_pem_x509_certificate(bytes_input)]
+    raise ImproperlyFormattedCert("Cert can not be read! It is not a valid PEM")
+
+
+def load_der_to_x509_all(bytes_input):
+    # type: (bytes) -> List[x509.Certificate]
+    """Converts bytes formatted DER (PKCS7 or Cert) to a list of :py:class:`cryptography.x509.Certificate` objects."""
     try:
-        return load_ascii_to_x509(bytes_input)
+        return [x509.load_der_x509_certificate(bytes_input)]
+    except ValueError:
+        return list(pkcs7.load_der_pkcs7_certificates(bytes_input))
+
+
+def load_bytes_to_x509_all(bytes_input):
+    # type: (bytes) -> List[x509.Certificate]
+    """Converts Certificate / PKCS7 in ASCII or DER to a list of :py:class:`cryptography.x509.Certificate` objects."""
+    try:
+        return load_ascii_to_x509_all(bytes_input)
     except UnicodeDecodeError:
-        return load_der_to_x509(bytes_input)
+        return load_der_to_x509_all(bytes_input)

@@ -24,6 +24,7 @@ except NameError:
                 "file_name": "-",
                 "info": False,
                 "include_root": False,
+                "include_cross_signs": False,
                 "ca_bundle_path": None,
             },
         ),
@@ -33,6 +34,7 @@ except NameError:
                 "file_name": "test.crt",
                 "info": False,
                 "include_root": False,
+                "include_cross_signs": False,
                 "ca_bundle_path": None,
             },
         ),
@@ -42,6 +44,7 @@ except NameError:
                 "file_name": "-",
                 "info": True,
                 "include_root": False,
+                "include_cross_signs": False,
                 "ca_bundle_path": None,
             },
         ),
@@ -51,6 +54,17 @@ except NameError:
                 "file_name": "-",
                 "info": False,
                 "include_root": True,
+                "include_cross_signs": False,
+                "ca_bundle_path": None,
+            },
+        ),
+        (
+            ["--include-cross-signs"],
+            {
+                "file_name": "-",
+                "info": False,
+                "include_root": False,
+                "include_cross_signs": True,
                 "ca_bundle_path": None,
             },
         ),
@@ -60,6 +74,7 @@ except NameError:
                 "file_name": "-",
                 "info": False,
                 "include_root": False,
+                "include_cross_signs": False,
                 "ca_bundle_path": "/path/to/ca/bundle",
             },
         ),
@@ -68,6 +83,7 @@ except NameError:
                 "test.crt",
                 "-i",
                 "--include-root",
+                "--include-cross-signs",
                 "--ca-bundle-path",
                 "/path/to/ca/bundle",
             ],
@@ -75,6 +91,7 @@ except NameError:
                 "file_name": "test.crt",
                 "info": True,
                 "include_root": True,
+                "include_cross_signs": True,
                 "ca_bundle_path": "/path/to/ca/bundle",
             },
         ),
@@ -88,6 +105,7 @@ def test_parse_args(cli_args, expected, monkeypatch):
     assert args.file_name == expected["file_name"]
     assert args.info == expected["info"]
     assert args.include_root == expected["include_root"]
+    assert args.include_cross_signs == expected["include_cross_signs"]
     assert args.ca_bundle_path == expected["ca_bundle_path"]
 
 
@@ -143,8 +161,7 @@ def test_display_flag_is_properly_formatted(capsys):
 
     captured = unicode(capsys.readouterr().out)
 
-    expected = unicode(
-        """== Certificate #1 ==
+    expected = unicode("""== Certificate #1 ==
 Subject:            CN=github.com,O=GitHub\\, Inc.,L=San Francisco,ST=California,C=US
 Issuer:             CN=DigiCert SHA2 High Assurance Server CA,OU=www.digicert.com,O=DigiCert Inc,C=US
 NotBefore:          2020-05-05T00:00:00{tz}
@@ -173,8 +190,7 @@ Is CA:              True
 Domains:
   Common name:      DigiCert SHA2 High Assurance Server CA
 
-"""
-    ).format(tz="+00:00" if CRYPTOGRAPHY_MAJOR > 42 else "")
+""").format(tz="+00:00" if CRYPTOGRAPHY_MAJOR > 42 else "")
 
     assert expected == captured
 
@@ -192,7 +208,11 @@ def test_display_flag_includes_warning_when_root_was_requested_but_not_found(cap
 )
 def test_main_handles_different_file_input(mocker, file_name, expected_content):
     args = mocker.Mock(
-        info=True, include_root=False, ca_bundle_path="/test/path", file_name="test.pem"
+        info=True,
+        include_root=False,
+        include_cross_signs=False,
+        ca_bundle_path="/test/path",
+        file_name="test.pem",
     )
     args.file_name = file_name
     mocker.patch("cert_chain_resolver.cli.parse_args", return_value=args)
@@ -223,6 +243,7 @@ def test_main_handles_different_file_input(mocker, file_name, expected_content):
         file_bytes=expected_content,
         show_details=True,
         include_root=False,
+        include_cross_signs=False,
         root_ca_store=mocker.ANY,
     )
 
@@ -234,3 +255,137 @@ def test_main_no_args_tty_shows_help_and_exits(mocker):
     with pytest.raises(SystemExit):
         main()
     assert sys.argv == ["script_name", "-h"]
+
+
+def _stub_resolve_with_cross_signs(mocker, leaf, intermediate, cross_signs):
+    """Patch cert_chain_resolver.cli.resolve so it returns a chain populated with cross-signs."""
+    from cert_chain_resolver.models import CertificateChain
+
+    chain = CertificateChain()
+    chain += leaf
+    chain += intermediate
+    for c in cross_signs:
+        chain.add_cross_sign(c)
+
+    mocker.patch("cert_chain_resolver.cli.resolve", return_value=chain)
+    return chain
+
+
+def _make_mock_cert(mocker, fingerprint, pem, is_ca, is_root, repr_str):
+    c = mocker.MagicMock(
+        fingerprint=fingerprint,
+        is_ca=is_ca,
+        is_root=is_root,
+    )
+    c.export.return_value = pem
+    c.__repr__ = lambda _self: repr_str
+    return c
+
+
+def test_cli_bundle_omits_cross_signs_when_flag_off(capsys, mocker):
+    leaf = _make_mock_cert(
+        mocker,
+        fingerprint="leaf-fp",
+        pem="LEAF-PEM\n",
+        is_ca=False,
+        is_root=False,
+        repr_str="<Cert leaf>",
+    )
+    intermediate = _make_mock_cert(
+        mocker,
+        fingerprint="int-fp",
+        pem="INT-PEM\n",
+        is_ca=True,
+        is_root=False,
+        repr_str="<Cert int>",
+    )
+    cross = _make_mock_cert(
+        mocker,
+        fingerprint="cross-fp",
+        pem="CROSS-PEM\n",
+        is_ca=True,
+        is_root=False,
+        repr_str="<Cert cross>",
+    )
+    _stub_resolve_with_cross_signs(mocker, leaf, intermediate, [cross])
+
+    cli(file_bytes=b"ignored")
+    out, err = capsys.readouterr()
+    assert "CROSS-PEM" not in out
+    assert "LEAF-PEM" in out and "INT-PEM" in out
+    assert "Pass --include-cross-signs" in err
+
+
+def test_cli_bundle_appends_cross_signs_when_flag_on(capsys, mocker):
+    leaf = _make_mock_cert(
+        mocker,
+        fingerprint="leaf-fp",
+        pem="LEAF-PEM\n",
+        is_ca=False,
+        is_root=False,
+        repr_str="<Cert leaf>",
+    )
+    intermediate = _make_mock_cert(
+        mocker,
+        fingerprint="int-fp",
+        pem="INT-PEM\n",
+        is_ca=True,
+        is_root=False,
+        repr_str="<Cert int>",
+    )
+    cross_a = _make_mock_cert(
+        mocker,
+        fingerprint="cross-a-fp",
+        pem="CROSS-A\n",
+        is_ca=True,
+        is_root=False,
+        repr_str="<Cert cross_a>",
+    )
+    cross_b = _make_mock_cert(
+        mocker,
+        fingerprint="cross-b-fp",
+        pem="CROSS-B\n",
+        is_ca=True,
+        is_root=False,
+        repr_str="<Cert cross_b>",
+    )
+    _stub_resolve_with_cross_signs(mocker, leaf, intermediate, [cross_a, cross_b])
+
+    cli(file_bytes=b"ignored", include_cross_signs=True)
+    out, err = capsys.readouterr()
+
+    # Bundle order: leaf, intermediate, cross_a, cross_b
+    assert out == "LEAF-PEM\nINT-PEM\nCROSS-A\nCROSS-B\n"
+    # No hint when flag is on
+    assert "Pass --include-cross-signs" not in err
+
+
+def test_cli_info_reports_cross_signs_always(capsys, mocker):
+    """--info shows the Cross-sign section regardless of --include-cross-signs."""
+    import datetime
+
+    def _make_info_cert(name, fp, is_ca, is_root):
+        m = mocker.MagicMock()
+        m.fingerprint = fp
+        m.subject = "CN=" + name
+        m.issuer = "CN=Issuer"
+        m.common_name = name
+        m.serial = 1
+        m.is_ca = is_ca
+        m.is_root = is_root
+        m.subject_alternative_names = []
+        m.ca_issuer_access_location = None
+        m.not_valid_before = datetime.datetime(2024, 1, 1)
+        m.not_valid_after = datetime.datetime(2025, 1, 1)
+        return m
+
+    leaf = _make_info_cert("leaf", "leaf-fp", is_ca=False, is_root=False)
+    intermediate = _make_info_cert("int", "int-fp", is_ca=True, is_root=False)
+    cross = _make_info_cert("cross", "cross-fp", is_ca=True, is_root=False)
+    _stub_resolve_with_cross_signs(mocker, leaf, intermediate, [cross])
+
+    cli(file_bytes=b"ignored", show_details=True)
+    out, err = capsys.readouterr()
+
+    assert "== Cross-sign #1 ==" in out
+    assert "Pass --include-cross-signs" in err

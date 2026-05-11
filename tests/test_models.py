@@ -11,8 +11,6 @@ from cryptography.hazmat.primitives.asymmetric.padding import PKCS1v15
 from cryptography.exceptions import InvalidSignature
 from ._utils import make_utc_aware_if_cryptography_above_42
 
-
-
 try:
     from contextlib import nullcontext as does_not_raise
 except ImportError:
@@ -53,8 +51,14 @@ def test_certcontainer_x509_helper_props(cert):
     assert fixture["ca"] == c.is_ca
     assert fixture["serial"] == c.serial
     assert fixture["signature_algorithm"] == c.signature_hash_algorithm
-    assert make_utc_aware_if_cryptography_above_42(fixture["not_before"]) == c.not_valid_before
-    assert make_utc_aware_if_cryptography_above_42(fixture["not_after"]) == c.not_valid_after
+    assert (
+        make_utc_aware_if_cryptography_above_42(fixture["not_before"])
+        == c.not_valid_before
+    )
+    assert (
+        make_utc_aware_if_cryptography_above_42(fixture["not_after"])
+        == c.not_valid_after
+    )
     assert fixture["fingerprint_sha256"] == c.fingerprint
     assert fixture["ca_issuer_access_location"] == c.ca_issuer_access_location
 
@@ -242,3 +246,102 @@ def test_is_issued_raises_when_no_signature_hash_algo(mock_x509, mock_cert):
     mock_x509.public_key = lambda: None
     with pytest.raises(MissingCertProperty):
         Cert(mock_x509).is_issued_by(mock_cert)
+
+
+def _load_sectigo_p7c_certs():
+    from cryptography.hazmat.primitives.serialization import pkcs7
+
+    with open("tests/certs/ca/sectigo_r46.p7c", "rb") as f:
+        return list(pkcs7.load_der_pkcs7_certificates(f.read()))
+
+
+@pytest.mark.filterwarnings(
+    "ignore:PKCS#7 certificates could not be parsed as DER:UserWarning"
+)
+def test_public_key_fingerprint_matches_across_cross_signs():
+    """Self-signed root and its cross-signs share the same Subject Public Key Info."""
+    x509_certs = _load_sectigo_p7c_certs()
+    fps = {Cert(c).public_key_fingerprint for c in x509_certs}
+    assert len(fps) == 1
+
+
+def test_public_key_fingerprint_differs_for_unrelated_cert(pem_github):
+    """Different identities yield different SPKI fingerprints."""
+    from cryptography import x509
+
+    leaf = Cert(x509.load_pem_x509_certificate(pem_github[0]["cert"].encode("ascii")))
+    intermediate = Cert(
+        x509.load_pem_x509_certificate(pem_github[1]["cert"].encode("ascii"))
+    )
+    assert leaf.public_key_fingerprint != intermediate.public_key_fingerprint
+
+
+def test_is_cross_sign_of():
+    """Same Subject + same SPKI + distinct cert is a cross-sign; everything else is not."""
+
+    def make(_subject, _spki, _fp):
+        class _C(Cert):
+            subject = _subject
+            public_key_fingerprint = _spki
+            fingerprint = _fp
+            __init__ = lambda self: None
+
+        return _C()
+
+    primary = make("CN=Root", "spki1", "fp1")
+    cross_sign = make("CN=Root", "spki1", "fp2")
+    same_subject_different_key = make("CN=Root", "spki2", "fp3")
+    different_subject = make("CN=Other", "spki1", "fp4")
+
+    assert cross_sign.is_cross_sign_of(primary) is True
+    assert same_subject_different_key.is_cross_sign_of(primary) is False
+    assert different_subject.is_cross_sign_of(primary) is False
+    assert primary.is_cross_sign_of(primary) is False  # not its own cross-sign
+
+
+def test_chain_cross_signs_default_empty(mocker):
+    chain = CertificateChain()
+    assert chain.cross_signs == []
+
+
+def test_chain_add_cross_sign_appends_and_dedups(mocker):
+    chain = CertificateChain()
+    cross = mocker.MagicMock(fingerprint="fp1")
+    cross_dup = mocker.MagicMock(fingerprint="fp1")
+    cross_other = mocker.MagicMock(fingerprint="fp2")
+
+    chain.add_cross_sign(cross)
+    chain.add_cross_sign(cross_dup)  # same fingerprint, ignored
+    chain.add_cross_sign(cross_other)
+
+    assert chain.cross_signs == [cross, cross_other]
+
+
+def test_chain_cross_signs_dont_pollute_intermediates(mocker):
+    """Cross-signs look like CA intermediates structurally but must not appear in .intermediates."""
+    leaf = mocker.MagicMock(is_ca=False, is_root=False)
+    intermediate = mocker.MagicMock(is_ca=True, is_root=False)
+    root = mocker.MagicMock(is_ca=True, is_root=True)
+    cross = mocker.MagicMock(is_ca=True, is_root=False, fingerprint="cross-fp")
+
+    chain = CertificateChain()
+    chain += leaf
+    chain += intermediate
+    chain += root
+    chain.add_cross_sign(cross)
+
+    assert list(chain.intermediates) == [intermediate]
+    assert list(chain) == [leaf, intermediate, root]
+    assert chain.cross_signs == [cross]
+
+
+def test_chain_cross_signs_returns_copy(mocker):
+    """Mutating the returned list must not affect the chain's internal state."""
+    chain = CertificateChain()
+    cross = mocker.MagicMock(fingerprint="fp1")
+    chain.add_cross_sign(cross)
+
+    out = chain.cross_signs
+    out.append("garbage")
+
+    assert chain.cross_signs == [cross]
