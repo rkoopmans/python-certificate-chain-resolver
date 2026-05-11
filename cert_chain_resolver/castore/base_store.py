@@ -1,7 +1,6 @@
 from cert_chain_resolver.exceptions import RootCertificateNotFound
 from cert_chain_resolver.models import Cert
 
-
 try:
     from typing import TYPE_CHECKING
 

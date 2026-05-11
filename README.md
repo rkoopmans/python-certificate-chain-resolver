@@ -20,6 +20,7 @@ The library provides an easy to use API to access each property of a certificate
 * PKCS7, PEM and DER formats
 * LetsEncrypt certificates
 * Including the root certificate using the system CA bundle or custom bundle
+* Discovering and including cross-signed variants of the root from the issuing CA's AIA bundle
 * Python2 (but not for much longer..)
 
 ## Installation
@@ -47,6 +48,20 @@ The bundle gets written to stdout and the chain information to stderr.
  2. <Cert common_name="DigiCert SHA2 High Assurance Server CA" subject="CN=DigiCert SHA2 High Assurance Server CA,OU=www.digicert.com,O=DigiCert Inc,C=US" issuer="CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US">
  3. <Cert common_name="DigiCert High Assurance EV Root CA" subject="CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US" issuer="CN=DigiCert High Assurance EV Root CA,OU=www.digicert.com,O=DigiCert Inc,C=US">
 ```
+
+### Including cross-signed root variants
+
+Some roots are cross-signed by older CAs so that clients which don't yet trust the modern root can still build a path to a trust anchor they do have. Pass `--include-cross-signs` to append every cross-signed variant discovered in the issuing CA's AIA bundle:
+
+```
+ $ cert_chain_resolver --include-cross-signs certificate.crt > compat-bundle.crt
+ 1. <Cert common_name="*.tinifycdn.com" subject="CN=*.tinifycdn.com" issuer="CN=Sectigo Public Server Authentication CA DV R36,...">
+ 2. <Cert common_name="Sectigo Public Server Authentication CA DV R36" subject="..." issuer="CN=Sectigo Public Server Authentication Root R46,...">
+ 3. <Cert common_name="Sectigo Public Server Authentication Root R46" subject="..." issuer="CN=USERTrust RSA Certification Authority,...">
+ 4. <Cert common_name="Sectigo Public Server Authentication Root R46" subject="..." issuer="CN=AAA Certificate Services,...">
+```
+
+The flag composes with `--include-root`: with both, the self-signed root is emitted first and the cross-signs follow. Cross-signs that share Subject + Subject Public Key Info with a cert already in the chain (but were issued by a different CA) are detected automatically; nothing happens when the AIA bundle contains no extras.
 
 ## Python API
 

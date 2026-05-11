@@ -72,6 +72,27 @@ Not all CA intermediates provide a web traversable path to the root certificate.
        print(cert)
 
 
+Inspecting cross-signed root variants
+-------------------------------------
+
+When the issuing CA's AIA bundle contains more than one certificate sharing the same Subject and public key (a self-signed root plus one or more cross-signed variants by older CAs), those siblings are recorded on the chain as ``cross_signs``. They are kept separate from the main chain so iteration and ``chain.intermediates`` are unaffected.
+
+.. code-block:: python
+
+   from cert_chain_resolver.api import resolve
+
+   with open('cert.pem', 'rb') as f:
+       chain = resolve(f.read())
+
+   for cs in chain.cross_signs:
+       print("Cross-sign of", cs.subject, "by", cs.issuer)
+       print(cs.export())
+
+For a Sectigo R46-issued certificate this might print two cross-signs — one issued by *USERTrust RSA Certification Authority* and one by *AAA Certificate Services* — both with Subject ``Sectigo Public Server Authentication Root R46``.
+
+Detection is purely based on what the CA publishes in its AIA bundle; no external lookups are made. Signatures on cross-sign candidates are not verified by the resolver itself.
+
+
 Handling Errors
 ===============
 

@@ -31,12 +31,9 @@ eligible_paths = [
 class FileSystemStore(CAStore):
     """The :class:`SystemStore <SystemStore>` for finding the CA from file system bundle (PEM ONLY)."""
 
-    _cache = None  # type: dict[str, list[Cert]]
-    path = None  # type: str
-
     def __init__(self, path=None):
         # (None | str) -> None
-        self._cache = defaultdict(list)
+        self._cache = defaultdict(list)  # type: dict[str, list[Cert]]
         if not path:
             try:
                 path = next(p for p in eligible_paths if p and os.path.exists(p))
