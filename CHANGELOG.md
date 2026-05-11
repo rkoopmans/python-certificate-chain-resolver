@@ -1,6 +1,6 @@
 # Changelog 
 
-## Unreleased
+## 1.5.0
 
 * New: discover cross-signed root variants from the issuing CA's AIA bundle and expose them on the chain.
     * CLI: new `--include-cross-signs` flag appends discovered cross-signs to the bundle output. Cross-signs are also surfaced in `--info` regardless of the flag.
